@@ -2,442 +2,661 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>PMT Click</title>
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css?v=16.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMT Click • Biến Điện Thoại Thành Bàn Phím & Chuột PC Siêu Nhạy</title>
+    <meta name="description" content="Tải ứng dụng PMT Click cho điện thoại Android. Điều khiển máy tính từ xa qua Wi-Fi và 4G với bàn phím cơ ảo và trackpad chuột siêu mượt độ trễ dưới 1ms.">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/logo.png">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #06080e;
+            --bg-card: rgba(16, 22, 36, 0.75);
+            --bg-card-hover: rgba(22, 30, 50, 0.9);
+            --border-glow: rgba(0, 240, 255, 0.2);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f0ff;
+            --neon-coral: #ff3366;
+            --neon-green: #00ff9d;
+            --neon-amber: #ffb800;
+            --text-title: #ffffff;
+            --text-body: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-body);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 25%, rgba(255, 51, 102, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 80%, rgba(0, 255, 157, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Ambient Glow Blobs */
+        .ambient-glow {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+        }
+        .glow-1 { top: -10%; left: 20%; width: 450px; height: 450px; background: rgba(0, 240, 255, 0.12); }
+        .glow-2 { top: 40%; right: -5%; width: 400px; height: 400px; background: rgba(255, 51, 102, 0.1); }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation Header */
+        header {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border-subtle);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(6, 8, 14, 0.85);
+        }
+        .nav-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand img {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+        .brand:hover img {
+            transform: scale(1.08) rotate(4deg);
+        }
+        .brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -0.5px;
+        }
+        .brand-title span {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+        }
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-title);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+        .nav-btn:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4.5rem 0 3.5rem;
+            text-align: center;
+        }
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 18px;
+            border-radius: 30px;
+            background: rgba(0, 255, 157, 0.08);
+            border: 1px solid rgba(0, 255, 157, 0.25);
+            color: var(--neon-green);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.15);
+            animation: floatSlow 3s ease-in-out infinite;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            line-height: 1.15;
+            color: var(--text-title);
+            margin-bottom: 1.2rem;
+            letter-spacing: -1px;
+        }
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, #00f0ff 0%, #00ff9d 50%, #ffb800 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        .hero-desc {
+            font-size: 1.15rem;
+            max-width: 680px;
+            margin: 0 auto 2.5rem;
+            color: var(--text-body);
+            font-weight: 400;
+        }
+
+        /* Download Card Box */
+        .download-hero-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            max-width: 680px;
+            margin: 0 auto 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .download-hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-coral), transparent);
+        }
+
+        .btn-main-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            background: linear-gradient(135deg, #00f0ff 0%, #00d2ff 50%, #00ff9d 100%);
+            color: #030812;
+            padding: 1.1rem 2rem;
+            border-radius: 16px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.4), 0 0 20px rgba(0, 255, 157, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 1rem;
+        }
+        .btn-main-download:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 45px rgba(0, 240, 255, 0.6), 0 0 35px rgba(0, 255, 157, 0.5);
+            color: #000;
+        }
+        .btn-main-download .icon-down {
+            font-size: 1.6rem;
+            animation: pulseDown 1.8s infinite;
+        }
+        @keyframes pulseDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+
+        .alt-downloads {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .meta-badges {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 1.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: 'Roboto Mono', monospace;
+        }
+        .meta-badges span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Features Grid */
+        .features-section {
+            padding: 3rem 0;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 2.8rem;
+        }
+        .section-tag {
+            color: var(--neon-cyan);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-title);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 1.8rem 1.6rem;
+            backdrop-filter: blur(14px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-glow);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 240, 255, 0.15);
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.2rem;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            color: var(--neon-cyan);
+        }
+        .feature-card:nth-child(2) .feature-icon {
+            background: rgba(255, 51, 102, 0.1);
+            border-color: rgba(255, 51, 102, 0.2);
+            color: var(--neon-coral);
+        }
+        .feature-card:nth-child(3) .feature-icon {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: rgba(0, 255, 157, 0.2);
+            color: var(--neon-green);
+        }
+        .feature-card:nth-child(4) .feature-icon {
+            background: rgba(255, 184, 0, 0.1);
+            border-color: rgba(255, 184, 0, 0.2);
+            color: var(--neon-amber);
+        }
+        .feature-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-bottom: 0.6rem;
+        }
+        .feature-text {
+            font-size: 0.92rem;
+            color: var(--text-body);
+            line-height: 1.55;
+        }
+
+        /* Steps Guide Section */
+        .steps-section {
+            padding: 3.5rem 0;
+        }
+        .steps-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            backdrop-filter: blur(16px);
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .step-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--neon-cyan);
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .step-item h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-title);
+        }
+        .step-item p {
+            font-size: 0.9rem;
+            color: var(--text-body);
+            line-height: 1.5;
+        }
+
+        /* Web Controller Banner */
+        .web-banner {
+            margin: 3.5rem 0;
+            padding: 2.2rem 2rem;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.12), rgba(0, 240, 255, 0.08));
+            border: 1px solid rgba(255, 51, 102, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .web-banner-info h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 0.4rem;
+        }
+        .web-banner-info p {
+            font-size: 0.95rem;
+            color: var(--text-body);
+        }
+        .btn-launch-web {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ff3366, #ff6b8b);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(255, 51, 102, 0.4);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .btn-launch-web:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 35px rgba(255, 51, 102, 0.6);
+            color: #fff;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 2.5rem 0;
+            text-align: center;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+        footer a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.3rem; }
+            .hero-desc { font-size: 1rem; }
+            .download-hero-card { padding: 1.8rem 1.2rem; }
+            .btn-main-download { font-size: 1.1rem; padding: 1rem 1.4rem; }
+            .web-banner { text-align: center; justify-content: center; }
+        }
+    </style>
 </head>
 <body>
-    <div id="portrait-warning" class="portrait-warning">
-        <div class="warning-icon">🔄</div>
-        <h2>Vui lòng xoay ngang điện thoại</h2>
-        <p>Giao diện Hacker's Keyboard & Trackpad hoạt động tốt nhất ở chế độ nằm ngang (Landscape).</p>
-    </div>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
 
-    <!-- Cyberpunk Loading Transition Screen (Chuyển cảnh kết nối mượt mà) -->
-    <div id="loading-transition-screen" class="loading-transition-overlay hide">
-        <div class="cyber-loading-box">
-            <!-- Rotating Holographic Cyber Hexagon Core -->
-            <div class="cyber-hexagon-wrapper">
-                <div class="cyber-hex-ring outer"></div>
-                <div class="cyber-hex-ring middle"></div>
-                <div class="cyber-hex-core">
-                    <img src="logo.png" alt="PMT" class="hex-logo">
-                </div>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="container nav-wrap">
+            <a href="/" class="brand">
+                <img src="/logo.png" alt="PMT Click Logo" onerror="this.src='https://raw.githubusercontent.com/letrungquangm-alt/pmt-click/main/static/logo.png'">
+                <div class="brand-title">PMT <span>CLICK</span></div>
+            </a>
+            <div style="display: flex; gap: 10px;">
+                <a href="/controller.html" class="nav-btn">🌐 Mở Web Controller</a>
+                <a href="https://github.com/letrungquangm-alt/pmt-click" target="_blank" rel="noopener" class="nav-btn">⭐ GitHub</a>
             </div>
-
-            <div class="loading-text-group">
-                <h3 id="loading-title" class="loading-title">ĐANG KẾT NỐI MÁY TÍNH</h3>
-                <p id="loading-subtitle" class="loading-subtitle">Khởi tạo đường truyền độ trễ siêu thấp (&lt; 1ms)...</p>
-            </div>
-
-            <!-- Glowing Cyber Progress Bar -->
-            <div class="cyber-progress-container">
-                <div id="cyber-progress-bar" class="cyber-progress-bar"></div>
-            </div>
-
-            <!-- Dynamic Cyber Status Steps -->
-            <div class="cyber-steps-list">
-                <div class="cyber-step" id="step-1">
-                    <span class="step-icon">📡</span>
-                    <span class="step-text" id="step-1-text">Dò tìm máy tính trên mạng Wi-Fi / STUN WebRTC...</span>
-                    <span class="step-status" id="step-1-status">⏳</span>
-                </div>
-                <div class="cyber-step" id="step-2">
-                    <span class="step-icon">💻</span>
-                    <span class="step-text" id="step-2-text">Bắt tay giao thức WebRTC P2P / WebSocket 60 FPS...</span>
-                    <span class="step-status" id="step-2-status">⋯</span>
-                </div>
-                <div class="cyber-step" id="step-3">
-                    <span class="step-icon">⚡</span>
-                    <span class="step-text" id="step-3-text">Kích hoạt Win32 SendInput Native (&lt;1ms)...</span>
-                    <span class="step-status" id="step-3-status">⋯</span>
-                </div>
-            </div>
-
-            <div id="loading-error-msg" class="loading-error-msg hide"></div>
-            <button id="btn-cancel-loading" class="btn-cancel-loading">✕ HỦY BỎ / QUAY LẠI</button>
         </div>
-    </div>
+    </header>
 
-    <!-- Connection Disconnected Overlay Popup -->
-    <div id="disconnect-overlay" class="disconnect-overlay">
-        <div class="disconnect-card">
-            <div class="spinner"></div>
-            <h3>🔴 Mất kết nối với Máy tính</h3>
-            <p>Server trên PC đã dừng hoặc bị ngắt kết nối. Đang tự động kết nối lại khi bạn bật lại Server...</p>
-        </div>
-    </div>
-
-    <!-- Connection Hub Launcher Modal -->
-    <div id="connection-hub" class="connection-hub-overlay hide">
-        <div class="connection-hub-card">
-            <button id="btn-close-hub" class="btn-close-hub" title="Đóng bảng kết nối">✕</button>
-
-            <div class="hub-header">
-                <div class="hub-logo-container">
-                    <img src="logo.png" alt="PMT Click" class="hub-logo">
-                    <div class="hub-logo-glow"></div>
-                </div>
-                <h2>PMT CLICK</h2>
-                <p class="hub-subtitle">⚡ Trung Tâm Điều Khiển Không Dây Máy Tính ⚡</p>
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="version-badge">
+                <span class="pulse-dot"></span>
+                <span>PHIÊN BẢN v2.2 NATIVE • ANDROID 5.0+</span>
             </div>
 
-            <div class="hub-tabs">
-                <button id="tab-btn-wifi" class="hub-tab-btn active">📶 Wi-Fi Tự Động</button>
-                <button id="tab-btn-remote" class="hub-tab-btn">⚡ WebRTC / Mã ID</button>
-                <button id="tab-btn-manual" class="hub-tab-btn">⌨️ Nhập IP Trực Tiếp</button>
-            </div>
+            <h1>Biến Điện Thoại Thành<br><span class="gradient-text">Bàn Phím Cơ & Chuột Trackpad</span></h1>
+            
+            <p class="hero-desc">
+                Ứng dụng điều khiển máy tính độ trễ cực thấp (< 1ms). Kết nối tức thì qua Wi-Fi nội bộ hoặc 4G/5G Internet. Hoàn toàn miễn phí và an toàn 100%.
+            </p>
 
-            <!-- Tab 1: Wi-Fi Auto-Discovery -->
-            <div id="tab-pane-wifi" class="hub-tab-pane active">
-                <div class="radar-box">
-                    <div class="radar-sweep"></div>
-                    <div class="radar-ring r1"></div>
-                    <div class="radar-ring r2"></div>
-                    <div class="radar-center-dot"></div>
-                </div>
-                <div class="discovery-header">
-                    <span class="pulse-dot"></span>
-                    <span id="discovery-status-text">Đang quét tìm máy tính trong Wi-Fi...</span>
-                    <button id="btn-rescan-wifi" class="btn-rescan">🔄 Quét Lại</button>
-                </div>
-                <div id="discovered-pc-list" class="discovered-list">
-                    <!-- Dynamic PC Cards injected here -->
-                </div>
-                <div id="no-pc-hint" class="no-pc-hint">
-                    <p>💡 Đảm bảo máy tính đã mở phần mềm <b>PMT Click</b> và kết nối cùng mạng Wi-Fi.</p>
-                </div>
-            </div>
-
-            <!-- Tab 2: Remote 6-Digit ID & WebRTC P2P Direct -->
-            <div id="tab-pane-remote" class="hub-tab-pane hide">
-                <div class="remote-banner">
-                    <span class="badge-gold">⚡ KẾT NỐI TỪ XA 4G/5G QUA DOMAIN CHÍNH THỨC</span>
-                    <p>Nhập <b>Mã ID 6 số</b> hoặc kết nối trực tiếp qua Domain chính chủ:</p>
-                </div>
-                <div class="code-input-container">
-                    <input type="text" id="remote-id-input" class="remote-id-input" placeholder="quiniumthu.qd.je hoặc Mã 6 số" autocomplete="off">
-                    <button id="btn-connect-remote" class="btn-connect-remote">🚀 KẾT NỐI</button>
-                </div>
-                <div class="quick-ip-chips" style="margin-top: 10px;">
-                    <span class="chip-label">Domain chính thức:</span>
-                    <button class="ip-chip chip-primary" data-ip="quiniumthu.qd.je">🌐 quiniumthu.qd.je</button>
-                </div>
-                <div id="remote-status-msg" class="remote-status-msg"></div>
-            </div>
-
-            <!-- Tab 3: Manual Direct IP/URL -->
-            <div id="tab-pane-manual" class="hub-tab-pane hide">
-                <p class="remote-hint">Nhập domain hoặc địa chỉ IP máy tính (Ví dụ: <code>quiniumthu.qd.je</code> hoặc <code>192.168.1.10:5000</code>):</p>
-                <div class="manual-input-container">
-                    <input type="text" id="manual-host-input" class="manual-host-input" placeholder="quiniumthu.qd.je">
-                    <button id="btn-connect-manual" class="btn-connect-manual">🔗 KẾT NỐI</button>
-                </div>
-                <div class="quick-ip-chips">
-                    <span class="chip-label">Gợi ý nhanh:</span>
-                    <button class="ip-chip chip-primary" data-ip="quiniumthu.qd.je">🌐 quiniumthu.qd.je</button>
-                    <button class="ip-chip" data-ip="192.168.1.10:5000">192.168.1.10:5000</button>
-                    <button class="ip-chip" data-ip="192.168.1.2:5000">192.168.1.2:5000</button>
-                </div>
-            </div>
-
-            <div class="hub-footer">
-                <a href="PMT_Click.apk" class="apk-download-badge" download="PMT_Click.apk">
-                    📱 <span>Tải App Android APK (PMT Click)</span>
+            <!-- Main Download Box -->
+            <div class="download-hero-card">
+                <a href="/PMT_Click.apk" download="PMT_Click.apk" class="btn-main-download" id="btn-direct-download">
+                    <span class="icon-down">📥</span>
+                    <span>TẢI VỀ APK CHO ANDROID (MIỄN PHÍ)</span>
                 </a>
+
+                <div class="alt-downloads">
+                    <a href="https://raw.githubusercontent.com/letrungquangm-alt/pmt-click/main/PMT_Click.apk" download class="btn-secondary">
+                        <span>⚡</span> Tải qua GitHub Mirror (Dự phòng)
+                    </a>
+                    <a href="/controller.html" class="btn-secondary">
+                        <span>🎮</span> Dùng Bàn Phím Ngay Trên Trình Duyệt
+                    </a>
+                </div>
+
+                <div class="meta-badges">
+                    <span>📦 Dung lượng: <strong>165 KB</strong></span>
+                    <span>•</span>
+                    <span>⚡ Độ trễ: <strong>&lt; 1ms</strong></span>
+                    <span>•</span>
+                    <span>🛡️ Quét sạch: <strong>0% Virus</strong></span>
+                    <span>•</span>
+                    <span>🔄 Cập nhật: <strong>Hôm nay</strong></span>
+                </div>
             </div>
+        </section>
+
+        <!-- Features Showcase Grid -->
+        <section class="features-section">
+            <div class="section-header">
+                <div class="section-tag">Tính Năng Đỉnh Cao</div>
+                <h2 class="section-title">Tại Sao Nên Chọn PMT Click?</h2>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⌨️</div>
+                    <h3 class="feature-title">Bàn Phím Cơ Ảo Đầy Đủ</h3>
+                    <p class="feature-text">Tích hợp trọn vẹn dãy F1-F12, Esc, Ctrl, Alt, Shift, phím Windows và cụm phím điều hướng. Hỗ trợ gõ văn bản tiếng Việt cực nhạy và phím tắt game.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🖱️</div>
+                    <h3 class="feature-title">Chuột Trackpad Cực Mượt</h3>
+                    <p class="feature-text">Chạm 1 ngón để click chuột trái, chạm 2 ngón mở menu chuột phải, vuốt 2 ngón để cuộn trang mượt mà như bàn di chuột trên laptop cao cấp.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Độ Trễ Siêu Thấp &lt; 1ms</h3>
+                    <p class="feature-text">Sử dụng giao thức truyền nhận nhị phân Win32 SendInput Native tối ưu hóa luồng I/O, đảm bảo phản hồi tức thì cho cả văn phòng và chơi game.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📶</div>
+                    <h3 class="feature-title">Quét Mã QR Kết Nối Tức Thì</h3>
+                    <p class="feature-text">Không cần cấu hình phức tạp. Chỉ cần mở app PMT Click trên điện thoại và quét mã QR trên màn hình máy tính để kết nối trong 1 giây.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔋</div>
+                    <h3 class="feature-title">Siêu Nhẹ & Tiết Kiệm Pin</h3>
+                    <p class="feature-text">Dung lượng cài đặt vỏn vẹn 165 KB, tiêu tốn 0% CPU lúc nghỉ và tương thích hoàn hảo từ Android 5.0 Lollipop đến Android 15 mới nhất.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">100% Portable & An Toàn</h3>
+                    <p class="feature-text">Máy chủ PC chạy cô lập hoàn toàn trên ổ di động, không cài đặt rác hệ thống vào ổ C, không chứa quảng cáo và bảo vệ quyền riêng tư.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick 3-Step Setup Guide -->
+        <section class="steps-section">
+            <div class="steps-box">
+                <div class="section-header" style="margin-bottom: 1.5rem;">
+                    <div class="section-tag">Hướng Dẫn Cài Đặt</div>
+                    <h2 class="section-title">3 Bước Đơn Giản Để Bắt Đầu</h2>
+                </div>
+
+                <div class="steps-grid">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <h4>Tải File APK Về Máy</h4>
+                        <p>Bấm nút <strong>"Tải về APK cho Android"</strong> ở trên để tải file <code>PMT_Click.apk</code> trực tiếp về điện thoại.</p>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <h4>Cài Đặt Ứng Dụng</h4>
+                        <p>Mở file vừa tải về. Nếu điện thoại hỏi bảo mật nguồn ngoài, hãy chọn <em>"Cho phép từ nguồn này"</em> để hoàn tất cài đặt.</p>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <h4>Quét QR & Sử Dụng</h4>
+                        <p>Mở phần mềm trên máy tính, dùng app PMT Click quét mã QR trên màn hình PC và bắt đầu rê chuột, gõ phím ngay lập tức!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Web Controller Promo Banner -->
+        <section class="web-banner">
+            <div class="web-banner-info">
+                <h3>Không muốn cài ứng dụng? Dùng ngay trên Web!</h3>
+                <p>Bạn có thể mở bộ Bàn phím & Chuột ảo trực tiếp trong trình duyệt điện thoại mà không cần cài file APK.</p>
+            </div>
+            <a href="/controller.html" class="btn-launch-web">
+                <span>🎮</span> Mở Web Controller Ngay
+            </a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p style="margin-bottom: 0.6rem;">© 2026 <strong>PMT Click</strong> • Phát triển và phân phối độc quyền bởi <strong>QuinGM luv Mthu Menu</strong>.</p>
+            <p>Mã nguồn mở & Bản quyền được lưu trữ tại <a href="https://github.com/letrungquangm-alt/pmt-click" target="_blank" rel="noopener">GitHub: letrungquangm-alt/pmt-click</a></p>
         </div>
-    </div>
+    </footer>
 
-    <!-- Floating Stealth Trigger (Bật lại phím khi ở chế độ Ẩn 100%) -->
-    <div id="stealth-trigger" class="stealth-trigger" title="Bật lại giao diện phím">👁️</div>
-
-    <!-- Live PC Screen Desktop Streaming Layer (Hardware-Accelerated Canvas nền) -->
-    <canvas id="live-pc-screen" class="live-pc-screen hide"></canvas>
-
-    <div class="app-container" id="app-container">
-        <!-- Top Status Header -->
-        <header class="top-bar">
-            <div class="status-box">
-                <span id="status-indicator" class="status-dot disconnected"></span>
-                <span id="status-text" class="status-text">Đang kết nối...</span>
-                <button id="btn-switch-pc" class="btn-switch-pc" title="Đổi máy tính hoặc chọn kết nối khác">🔗 Đổi Máy</button>
-                <a href="/apk" class="btn-download-apk-header" title="Tải ứng dụng Android APK cho máy">📥 Tải APK</a>
-            </div>
-
-            <!-- Layout Mode Switcher (Keyboard / Trackpad / Combo) -->
-            <div class="layout-switcher">
-                <button id="btn-mode-kbd" class="layout-btn active" title="Chỉ Bàn phím">⌨️ Phím</button>
-                <button id="btn-mode-pad" class="layout-btn" title="Chỉ Bàn di chuột Trackpad">🖱️ Chuột</button>
-                <button id="btn-mode-combo" class="layout-btn" title="Hiển thị Cả Hai">⌨️+🖱️ Song song</button>
-            </div>
-
-            <!-- Sticky Modifiers Status Indicator -->
-            <div class="active-modifiers" id="active-modifiers">
-                <span class="mod-pill" id="mod-ctrl">CTRL</span>
-                <span class="mod-pill" id="mod-alt">ALT</span>
-                <span class="mod-pill" id="mod-shift">SHIFT</span>
-                <span class="mod-pill" id="mod-win">WIN</span>
-            </div>
-
-            <div class="header-controls">
-                <button id="btn-ghost-mode" class="icon-btn" title="Làm mờ / Ẩn phím toàn màn hình">👁️ 100% Phím</button>
-                <button id="btn-screen-toggle" class="icon-btn" title="Bật/Tắt Xem Màn hình PC thời gian thực">📺 Màn hình PC</button>
-                <button id="btn-scroll-dir" class="icon-btn" title="Đổi chiều cuộn chuột">🔄 Cuộn Chuột</button>
-                <button id="btn-fn-toggle" class="icon-btn" title="Hiện dãy phím F1-F12">⚡ Fn Bar</button>
-                <button id="btn-vibrate" class="icon-btn active" title="Bật/Tắt Rung">📳 Rung</button>
-                <button id="btn-fullscreen" class="icon-btn" title="Toàn màn hình">⛶ Mở rộng</button>
-            </div>
-        </header>
-
-        <!-- Expandable Fn Bar (F1-F12 & Special Keys) -->
-        <div id="fn-bar" class="fn-bar-container">
-            <div class="fn-bar-row">
-                <button class="key key-f" data-key="f1">F1</button>
-                <button class="key key-f" data-key="f2">F2</button>
-                <button class="key key-f" data-key="f3">F3</button>
-                <button class="key key-f" data-key="f4">F4</button>
-                <button class="key key-f" data-key="f5">F5</button>
-                <button class="key key-f" data-key="f6">F6</button>
-                <button class="key key-f" data-key="f7">F7</button>
-                <button class="key key-f" data-key="f8">F8</button>
-                <button class="key key-f" data-key="f9">F9</button>
-                <button class="key key-f" data-key="f10">F10</button>
-                <button class="key key-f" data-key="f11">F11</button>
-                <button class="key key-f" data-key="f12">F12</button>
-                <button class="key key-fn-special" data-key="prtsc">PrtSc</button>
-                <button class="key key-fn-special" data-key="del">Del</button>
-            </div>
-            <div class="fn-bar-row">
-                <button class="key key-fn-special" data-key="home">Home</button>
-                <button class="key key-fn-special" data-key="end">End</button>
-                <button class="key key-fn-special" data-key="pageup">PgUp</button>
-                <button class="key key-fn-special" data-key="pagedown">PgDn</button>
-                <button class="key key-fn-special" data-key="insert">Ins</button>
-                <button class="shortcut-btn" data-shortcut="ctrl,c">Ctrl+C</button>
-                <button class="shortcut-btn" data-shortcut="ctrl,v">Ctrl+V</button>
-                <button class="shortcut-btn" data-shortcut="ctrl,z">Ctrl+Z</button>
-                <button class="shortcut-btn" data-shortcut="ctrl,a">Ctrl+A</button>
-                <button class="shortcut-btn" data-shortcut="alt,tab">Alt+Tab</button>
-                <button class="shortcut-btn" data-shortcut="win,d">Win+D</button>
-            </div>
-        </div>
-
-        <!-- MAIN CONTENT AREA (Flex Layout for Keyboard & Trackpad) -->
-        <div id="content-workspace" class="content-workspace mode-kbd">
-
-            <!-- TRACKPAD PANEL (Mouse Surface) -->
-            <div id="trackpad-panel" class="trackpad-panel">
-                <div id="trackpad-surface" class="trackpad-surface">
-                    <div class="trackpad-hint" id="trackpad-hint">
-                        <span>🖱️ BÀN DI CHUỘT TRACKPAD</span>
-                        <small>Vuốt 1 ngón: Di chuột | Chạm 1 ngón: Chuột Trái | Chạm 2 ngón: Chuột Phải | Vuốt 2 ngón: Cuộn trang</small>
-                    </div>
-                </div>
-                <!-- Dedicated Mouse Buttons Bar -->
-                <div class="mouse-buttons-bar">
-                    <button id="btn-mouse-left" class="mouse-btn btn-click-left">🖱️ Chuột Trái</button>
-                    <button id="btn-mouse-scroll-up" class="mouse-btn btn-scroll">🎡 Cuộn Lên</button>
-                    <button id="btn-mouse-scroll-down" class="mouse-btn btn-scroll">🎡 Cuộn Xuống</button>
-                    <button id="btn-mouse-right" class="mouse-btn btn-click-right">🖱️ Chuột Phải</button>
-                </div>
-            </div>
-
-            <!-- MAIN SMARTPHONE KEYBOARD LAYOUT -->
-            <main id="keyboard-panel" class="keyboard-grid" data-kbd-state="abc">
-                <!-- Quick Mode Switching Tabs -->
-                <div class="kbd-mode-tabs">
-                    <button class="kbd-tab-btn active" data-mode="abc">ABC (Chữ)</button>
-                    <button class="kbd-tab-btn" data-mode="123">?123 (Số & Ký hiệu)</button>
-                    <button class="kbd-tab-btn" data-mode="pc">#+= PC (Phím PC mở rộng)</button>
-                </div>
-
-                <!-- PAGE 1: LETTERS (ABC) -->
-                <div class="kbd-page kbd-page-abc">
-                    <!-- Row 1: QWERTY Row 1 -->
-                    <div class="key-row">
-                        <button class="key key-letter" data-key="q">q</button>
-                        <button class="key key-letter" data-key="w">w</button>
-                        <button class="key key-letter" data-key="e">e</button>
-                        <button class="key key-letter" data-key="r">r</button>
-                        <button class="key key-letter" data-key="t">t</button>
-                        <button class="key key-letter" data-key="y">y</button>
-                        <button class="key key-letter" data-key="u">u</button>
-                        <button class="key key-letter" data-key="i">i</button>
-                        <button class="key key-letter" data-key="o">o</button>
-                        <button class="key key-letter" data-key="p">p</button>
-                    </div>
-
-                    <!-- Row 2: ASDF Row 2 (Indented for standard phone muscle memory) -->
-                    <div class="key-row key-row-indent">
-                        <button class="key key-letter" data-key="a">a</button>
-                        <button class="key key-letter" data-key="s">s</button>
-                        <button class="key key-letter" data-key="d">d</button>
-                        <button class="key key-letter" data-key="f">f</button>
-                        <button class="key key-letter" data-key="g">g</button>
-                        <button class="key key-letter" data-key="h">h</button>
-                        <button class="key key-letter" data-key="j">j</button>
-                        <button class="key key-letter" data-key="k">k</button>
-                        <button class="key key-letter" data-key="l">l</button>
-                    </div>
-
-                    <!-- Row 3: ZXCV Row 3 -->
-                    <div class="key-row">
-                        <button class="key key-shift mod-trigger" data-key="shift">⇧</button>
-                        <button class="key key-letter" data-key="z">z</button>
-                        <button class="key key-letter" data-key="x">x</button>
-                        <button class="key key-letter" data-key="c">c</button>
-                        <button class="key key-letter" data-key="v">v</button>
-                        <button class="key key-letter" data-key="b">b</button>
-                        <button class="key key-letter" data-key="n">n</button>
-                        <button class="key key-letter" data-key="m">m</button>
-                        <button class="key key-backspace" data-key="backspace">⌫</button>
-                    </div>
-
-                    <!-- Row 4: Bottom Control Row (Mode + Ctrl + Alt + Win + Space + , + . + Tab + Enter) -->
-                    <div class="key-row">
-                        <button class="key key-mode-btn" data-mode="123">?123</button>
-                        <button class="key key-modifier mod-trigger" data-key="ctrl">Ctrl</button>
-                        <button class="key key-modifier mod-trigger" data-key="alt">Alt</button>
-                        <button class="key key-modifier mod-trigger" data-key="win">Win</button>
-                        <button class="key key-space" data-key="space">␣ English ▾</button>
-                        <button class="key key-symbol" data-key=",">,</button>
-                        <button class="key key-symbol" data-key=".">.</button>
-                        <button class="key key-pc" data-key="tab">Tab</button>
-                        <button class="key key-enter" data-key="enter">↵</button>
-                    </div>
-                </div>
-
-                <!-- PAGE 2: NUMBERS & DUAL SYMBOLS (?123) -->
-                <div class="kbd-page kbd-page-123">
-                    <!-- Row 1: Numbers (Shift: ! @ # $ % ^ & * ( ) ) -->
-                    <div class="key-row">
-                        <button class="key" data-key="1" data-shift="!">1</button>
-                        <button class="key" data-key="2" data-shift="@">2</button>
-                        <button class="key" data-key="3" data-shift="#">3</button>
-                        <button class="key" data-key="4" data-shift="$">4</button>
-                        <button class="key" data-key="5" data-shift="%">5</button>
-                        <button class="key" data-key="6" data-shift="^">6</button>
-                        <button class="key" data-key="7" data-shift="&amp;">7</button>
-                        <button class="key" data-key="8" data-shift="*">8</button>
-                        <button class="key" data-key="9" data-shift="(">9</button>
-                        <button class="key" data-key="0" data-shift=")">0</button>
-                    </div>
-
-                    <!-- Row 2: PC Main Symbols (Shift: _ + { } | : " < > ? ) -->
-                    <div class="key-row">
-                        <button class="key" data-key="-" data-shift="_">-</button>
-                        <button class="key" data-key="=" data-shift="+">=</button>
-                        <button class="key" data-key="[" data-shift="{">[</button>
-                        <button class="key" data-key="]" data-shift="}">]</button>
-                        <button class="key" data-key="\" data-shift="|">\</button>
-                        <button class="key" data-key=";" data-shift=":">;</button>
-                        <button class="key" data-key="'" data-shift='"'>'</button>
-                        <button class="key" data-key="," data-shift="&lt;">,</button>
-                        <button class="key" data-key="." data-shift="&gt;">.</button>
-                        <button class="key" data-key="/" data-shift="?">/</button>
-                    </div>
-
-                    <!-- Row 3: Shift Key Restored + Clean Quick Symbols -->
-                    <div class="key-row">
-                        <button class="key key-shift mod-trigger" data-key="shift">⇧</button>
-                        <button class="key" data-key="`" data-shift="~">`</button>
-                        <button class="key" data-key="!">!</button>
-                        <button class="key" data-key="?">?</button>
-                        <button class="key" data-key=":">:</button>
-                        <button class="key" data-key='"'>"</button>
-                        <button class="key" data-key="+">+</button>
-                        <button class="key" data-key="_">_</button>
-                        <button class="key key-backspace" data-key="backspace">⌫</button>
-                    </div>
-
-                    <!-- Row 4: Bottom Control Row (Sequential Mode Button -> #+=) -->
-                    <div class="key-row">
-                        <button class="key key-mode-btn" data-mode="pc">#+=</button>
-                        <button class="key key-modifier mod-trigger" data-key="ctrl">Ctrl</button>
-                        <button class="key key-modifier mod-trigger" data-key="alt">Alt</button>
-                        <button class="key key-modifier mod-trigger" data-key="win">Win</button>
-                        <button class="key key-space" data-key="space">␣ English ▾</button>
-                        <button class="key key-symbol" data-key=",">,</button>
-                        <button class="key key-symbol" data-key=".">.</button>
-                        <button class="key key-pc" data-key="tab">Tab</button>
-                        <button class="key key-enter" data-key="enter">↵</button>
-                    </div>
-                </div>
-
-                <!-- PAGE 3: FUNCTION KEYS, PC CONTROLS & ARROW KEYPAD (#+=) -->
-                <div class="kbd-page kbd-page-pc">
-                    <!-- Row 1: F1 to F12 Function Keys Bar -->
-                    <div class="key-row">
-                        <button class="key key-f" data-key="f1">F1</button>
-                        <button class="key key-f" data-key="f2">F2</button>
-                        <button class="key key-f" data-key="f3">F3</button>
-                        <button class="key key-f" data-key="f4">F4</button>
-                        <button class="key key-f" data-key="f5">F5</button>
-                        <button class="key key-f" data-key="f6">F6</button>
-                        <button class="key key-f" data-key="f7">F7</button>
-                        <button class="key key-f" data-key="f8">F8</button>
-                        <button class="key key-f" data-key="f9">F9</button>
-                        <button class="key key-f" data-key="f10">F10</button>
-                        <button class="key key-f" data-key="f11">F11</button>
-                        <button class="key key-f" data-key="f12">F12</button>
-                    </div>
-
-                    <!-- Row 2: PC Controls & Clean Full-Size Inverted-T Arrow Cluster -->
-                    <div class="key-row">
-                        <button class="key key-pc" data-key="esc">Esc</button>
-                        <button class="key key-pc" data-key="del">Del</button>
-                        <button class="key key-pc" data-key="insert">Ins</button>
-                        <button class="key key-pc" data-key="prtsc">PrtSc</button>
-                        <button class="key key-pc" data-key="home">Home</button>
-                        <button class="key key-pc" data-key="end">End</button>
-                        <button class="key key-pc" data-key="pageup">PgUp</button>
-                        <button class="key key-pc" data-key="pagedown">PgDn</button>
-                        <button class="key key-arrow" data-key="left">◀</button>
-                        <button class="key key-arrow" data-key="up">▲</button>
-                        <button class="key key-arrow" data-key="down">▼</button>
-                        <button class="key key-arrow" data-key="right">▶</button>
-                    </div>
-
-                    <!-- Row 3: Special PC Shortcuts & Restored Shift Key -->
-                    <div class="key-row">
-                        <button class="key key-shift mod-trigger" data-key="shift">⇧</button>
-                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,c">Copy</button>
-                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,v">Paste</button>
-                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,x">Cut</button>
-                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,z">Undo</button>
-                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,a">SelAll</button>
-                        <button class="key key-pc shortcut-btn" data-shortcut="alt,tab">Alt+Tab</button>
-                        <button class="key key-pc shortcut-btn" data-shortcut="win,d">Win+D</button>
-                        <button class="key key-backspace" data-key="backspace">⌫</button>
-                    </div>
-
-                    <!-- Row 4: Bottom Control Row (Sequential Mode Button -> ABC) -->
-                    <div class="key-row">
-                        <button class="key key-mode-btn" data-mode="abc">ABC</button>
-                        <button class="key key-modifier mod-trigger" data-key="ctrl">Ctrl</button>
-                        <button class="key key-modifier mod-trigger" data-key="alt">Alt</button>
-                        <button class="key key-modifier mod-trigger" data-key="win">Win</button>
-                        <button class="key key-space" data-key="space">␣ English ▾</button>
-                        <button class="key key-symbol" data-key=",">,</button>
-                        <button class="key key-symbol" data-key=".">.</button>
-                        <button class="key key-pc" data-key="tab">Tab</button>
-                        <button class="key key-enter" data-key="enter">↵</button>
-                    </div>
-                </div>
-            </main>
-
-        </div>
-    </div>
-
-    <script src="script.js?v=15.0"></script>
+    <script>
+        // Smooth download tracking and feedback
+        document.getElementById('btn-direct-download').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>⏳</span> <span>ĐANG BẮT ĐẦU TẢI XUỐNG...</span>';
+            setTimeout(() => {
+                btn.innerHTML = '<span>✅</span> <span>ĐÃ BẮT ĐẦU TẢI! VUI LÒNG KIỂM TRA THÔNG BÁO</span>';
+                setTimeout(() => { btn.innerHTML = originalText; }, 4000);
+            }, 1000);
+        });
+    </script>
 </body>
 </html>

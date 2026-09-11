@@ -7,8 +7,8 @@ echo ===========================================================================
 echo    CÔNG CỤ TỰ ĐỘNG TẢI TOÀN BỘ FILE LÊN HOSTING (quiniumthu.qd.je)
 echo ================================================================================
 echo.
-echo Thư mục nguồn: e:\code\code\static
-echo Máy chủ đích: ftp://ftpupload.net/htdocs/
+echo Thư mục nguồn : e:\code\code\File Manager Domain
+echo Máy chủ đích  : ftp://ftpupload.net/htdocs/
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& {
@@ -16,17 +16,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "& {
     $ftpHost = 'ftpupload.net'
     $ftpUser = 'alalr_42888185'
     $configFile = 'ftp_config.txt'
+    $sourceDir = 'e:\code\code\File Manager Domain'
 
-    # Auto sync newest PMT_Click.apk from root to static
+    # Tự động cập nhật PMT_Click.apk mới nhất từ thư mục gốc vào File Manager Domain
     $rootApk = 'e:\code\code\PMT_Click.apk'
-    $staticApk = 'e:\code\code\static\PMT_Click.apk'
+    $destApk = Join-Path $sourceDir 'PMT_Click.apk'
     if (Test-Path $rootApk) {
-        if (-not (Test-Path $staticApk) -or ((Get-Item $rootApk).LastWriteTime -gt (Get-Item $staticApk).LastWriteTime)) {
-            Copy-Item $rootApk $staticApk -Force
-            Write-Host '   [i] Đã cập nhật file PMT_Click.apk mới nhất vào thư mục static' -ForegroundColor Cyan
+        if (-not (Test-Path $destApk) -or ((Get-Item $rootApk).LastWriteTime -gt (Get-Item $destApk).LastWriteTime)) {
+            Copy-Item $rootApk $destApk -Force
+            Write-Host '   [i] Đã đồng bộ file PMT_Click.apk mới nhất vào File Manager Domain' -ForegroundColor Cyan
         }
     }
 
+    # Đọc mật khẩu
     $ftpPass = ''
     if (Test-Path $configFile) {
         $ftpPass = (Get-Content $configFile -Raw).Trim()
@@ -43,10 +45,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "& {
         Write-Host '[OK] Đã lưu mật khẩu vào ftp_config.txt (chỉ cần nhập 1 lần duy nhất)!' -ForegroundColor Green
     }
 
-    $sourceDir = 'e:\code\code\static'
+    if (-not (Test-Path $sourceDir)) {
+        New-Item -ItemType Directory -Path $sourceDir -Force | Out-Null
+    }
+
     $files = Get-ChildItem -Path $sourceDir -File
 
-    Write-Host ('`nBắt đầu tải lên ' + $files.Count + ' file...') -ForegroundColor White
+    if ($files.Count -eq 0) {
+        Write-Host '[!] Thư mục File Manager Domain đang trống, không có file nào để tải lên.' -ForegroundColor Yellow
+        exit 0
+    }
+
+    Write-Host ('`nBắt đầu tải lên ' + $files.Count + ' file từ thư mục [File Manager Domain]...') -ForegroundColor White
     $successCount = 0
 
     foreach ($f in $files) {

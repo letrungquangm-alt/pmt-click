@@ -4311,17 +4311,26 @@ namespace QuinGMMenu
             try
             {
                 // Chữ ký định danh độc quyền BẮT BUỘC: anhyeuempmt.tag
-                string loveTag = Path.Combine(root, "anhyeuempmt.tag");
-                if (File.Exists(loveTag))
+                string[] checkPaths = new string[]
                 {
-                    try
+                    Path.Combine(root, "anhyeuempmt.tag"),
+                    Path.Combine(root, "QuinGM", "anhyeuempmt.tag"),
+                    Path.Combine(Path.GetPathRoot(root), "anhyeuempmt.tag")
+                };
+
+                foreach (string loveTag in checkPaths)
+                {
+                    if (File.Exists(loveTag))
                     {
-                        string content = File.ReadAllText(loveTag, Encoding.UTF8);
-                        if (content.IndexOf("Anh_Yeu_Em_Pham_Minh_Thu_Ksenia_Rin_Luv_U", StringComparison.OrdinalIgnoreCase) >= 0)
-                            return true;
+                        try
+                        {
+                            string content = File.ReadAllText(loveTag, Encoding.UTF8);
+                            if (content.IndexOf("Anh_Yeu_Em_Pham_Minh_Thu_Ksenia_Rin_Luv_U", StringComparison.OrdinalIgnoreCase) >= 0)
+                                return true;
+                        }
+                        catch { }
+                        return true;
                     }
-                    catch { }
-                    return true;
                 }
             }
             catch { }

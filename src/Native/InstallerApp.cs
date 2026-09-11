@@ -20,7 +20,7 @@ namespace QuinGM.Installer
         private Panel progressFill;
         private Label lblProgressText;
         private Button btnInstall;
-        private Button btnUninstall;
+        private Button btnOpenFolder;
         private Button btnLaunch;
         private Label lblHeaderTitle;
         private Label lblHeaderSub;
@@ -29,7 +29,7 @@ namespace QuinGM.Installer
         public InstallerForm()
         {
             this.Text = "Trình Cài Đặt QuinGM luv Mthu Menu";
-            this.Size = new Size(620, 540);
+            this.Size = new Size(620, 520);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -165,7 +165,7 @@ namespace QuinGM.Installer
 
             lblHint = new Label
             {
-                Text = "👉 Nếu ĐÚNG ổ bạn muốn: Bấm [OK - CÀI ĐẶT APP] bên dưới.\n👉 Nếu SAI: Bạn bấm menu ở trên để tự chọn lại ổ đĩa khác theo ý muốn.",
+                Text = "👉 Nếu ĐÚNG ổ bạn muốn: Bấm [OK - BẮT ĐẦU CÀI ĐẶT APP] bên dưới.\n👉 Nếu SAI: Bạn bấm menu ở trên để tự chọn lại ổ đĩa khác theo ý muốn.",
                 Font = new Font("Segoe UI", 9F, FontStyle.Regular),
                 ForeColor = Color.FromArgb(254, 202, 202),
                 Location = new Point(22, 76),
@@ -248,7 +248,7 @@ namespace QuinGM.Installer
             {
                 Text = "✅ OK - BẮT ĐẦU CÀI ĐẶT APP 💕",
                 Location = new Point(25, 405),
-                Size = new Size(260, 52),
+                Size = new Size(265, 52),
                 BackColor = Color.FromArgb(85, 22, 55),
                 ForeColor = Color.FromArgb(255, 230, 245),
                 FlatStyle = FlatStyle.Flat,
@@ -259,26 +259,26 @@ namespace QuinGM.Installer
             btnInstall.Click += BtnInstall_Click;
             this.Controls.Add(btnInstall);
 
-            btnUninstall = new Button
+            btnOpenFolder = new Button
             {
-                Text = "🗑️ Gỡ Khỏi Desktop",
-                Location = new Point(295, 405),
-                Size = new Size(150, 52),
-                BackColor = Color.FromArgb(40, 18, 24),
-                ForeColor = Color.FromArgb(254, 202, 202),
+                Text = "📁 Mở Thư Mục",
+                Location = new Point(300, 405),
+                Size = new Size(135, 52),
+                BackColor = Color.FromArgb(34, 20, 36),
+                ForeColor = Color.FromArgb(240, 215, 235),
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
-            btnUninstall.FlatAppearance.BorderColor = Color.FromArgb(160, 40, 60);
-            btnUninstall.Click += BtnUninstall_Click;
-            this.Controls.Add(btnUninstall);
+            btnOpenFolder.FlatAppearance.BorderColor = Color.FromArgb(120, 60, 100);
+            btnOpenFolder.Click += (s, e) => OpenInstallFolder();
+            this.Controls.Add(btnOpenFolder);
 
             btnLaunch = new Button
             {
                 Text = "🎮 Mở Game",
-                Location = new Point(455, 405),
-                Size = new Size(125, 52),
+                Location = new Point(445, 405),
+                Size = new Size(135, 52),
                 BackColor = Color.FromArgb(32, 20, 32),
                 ForeColor = Color.FromArgb(240, 200, 220),
                 FlatStyle = FlatStyle.Flat,
@@ -311,8 +311,9 @@ namespace QuinGM.Installer
             {
                 if (!d.IsReady) continue;
                 string root = d.RootDirectory.FullName;
-                bool hasTag = CheckTagFile(root);
-                bool hasApp = File.Exists(Path.Combine(root, "QuinGM luv Mthu Menu.exe"));
+                string installFolder = Path.Combine(root, "QuinGM");
+                bool hasTag = CheckTagFile(root) || CheckTagFile(installFolder);
+                bool hasApp = File.Exists(Path.Combine(installFolder, "QuinGM luv Mthu Menu.exe")) || File.Exists(Path.Combine(root, "QuinGM luv Mthu Menu.exe"));
                 bool isRemovable = (d.DriveType == DriveType.Removable || (!root.StartsWith("C:", StringComparison.OrdinalIgnoreCase) && root.Length >= 2));
 
                 string labelName = d.VolumeLabel;
@@ -347,11 +348,11 @@ namespace QuinGM.Installer
             CheckSelectedDriveTag();
         }
 
-        private bool CheckTagFile(string root)
+        private bool CheckTagFile(string pathOrDir)
         {
             try
             {
-                string tagPath = Path.Combine(root, "anhyeuempmt.tag");
+                string tagPath = pathOrDir.EndsWith(".tag", StringComparison.OrdinalIgnoreCase) ? pathOrDir : Path.Combine(pathOrDir, "anhyeuempmt.tag");
                 if (File.Exists(tagPath))
                 {
                     string txt = File.ReadAllText(tagPath);
@@ -371,15 +372,18 @@ namespace QuinGM.Installer
                 lblTagStatus.Text = "Vui lòng chọn ổ đĩa.";
                 lblTagStatus.ForeColor = Color.Gray;
                 btnInstall.Enabled = false;
+                btnOpenFolder.Enabled = false;
                 return;
             }
 
-            string appPath = Path.Combine(item.Root, "QuinGM luv Mthu Menu.exe");
-            bool appExists = File.Exists(appPath);
+            string installDir = Path.Combine(item.Root, "QuinGM");
+            string appPath = Path.Combine(installDir, "QuinGM luv Mthu Menu.exe");
+            bool appExists = File.Exists(appPath) || File.Exists(Path.Combine(item.Root, "QuinGM luv Mthu Menu.exe"));
+            btnOpenFolder.Enabled = Directory.Exists(installDir) || appExists;
 
             if (item.HasTag && appExists)
             {
-                lblTagStatus.Text = "✅ Ổ đĩa " + item.Root + " đã có app & khoá định mệnh ẩn hợp lệ!\nBấm [CẬP NHẬT APP] nếu muốn cài lại bản mới nhất.";
+                lblTagStatus.Text = "✅ Ổ đĩa " + item.Root + " đã có app & khoá định mệnh ẩn hợp lệ!\nBấm [CẬP NHẬT APP] nếu muốn cập nhật lại bản mới nhất.";
                 lblTagStatus.ForeColor = Color.FromArgb(74, 222, 128);
                 btnInstall.Text = "🔄 OK - CẬP NHẬT APP 💕";
             }
@@ -415,14 +419,27 @@ namespace QuinGM.Installer
             {
                 lblDesktopStatus.Text = "💻 Màn hình Desktop máy này: ĐÃ CÓ PHÍM TẮT BẢN QUYỀN ✅";
                 lblDesktopStatus.ForeColor = Color.FromArgb(74, 222, 128);
-                btnUninstall.Enabled = true;
             }
             else
             {
                 lblDesktopStatus.Text = "💻 Màn hình Desktop máy này: CHƯA CÓ PHÍM TẮT";
                 lblDesktopStatus.ForeColor = Color.FromArgb(251, 191, 36);
-                btnUninstall.Enabled = false;
             }
+        }
+
+        private void CreateHiddenTagFile(string tagPath)
+        {
+            try
+            {
+                if (File.Exists(tagPath))
+                {
+                    File.SetAttributes(tagPath, FileAttributes.Normal);
+                }
+                File.WriteAllText(tagPath, "Anh_Yeu_Em_Pham_Minh_Thu_Ksenia_Rin_Luv_U", System.Text.Encoding.UTF8);
+                // Đặt thuộc tính Ẩn bí mật và Tàng hình (Hidden + System)
+                File.SetAttributes(tagPath, FileAttributes.Hidden | FileAttributes.System);
+            }
+            catch { }
         }
 
         private void BtnInstall_Click(object sender, EventArgs e)
@@ -431,28 +448,37 @@ namespace QuinGM.Installer
             if (item == null) return;
 
             string driveRoot = item.Root;
+            string installDir = Path.Combine(driveRoot, "QuinGM");
+
             btnInstall.Enabled = false;
             btnLaunch.Enabled = false;
+            btnOpenFolder.Enabled = false;
             progressBg.Visible = true;
             progressFill.Width = 10;
-            lblProgressText.Text = "Đang khởi tạo gói cài đặt...";
+            lblProgressText.Text = "Đang khởi tạo thư mục cài đặt: " + installDir + "...";
 
             Timer animTimer = new Timer { Interval = 20 };
             int step = 0;
             animTimer.Tick += (s, ev) => {
                 step++;
-                if (step == 10)
+                if (step == 8)
                 {
-                    progressFill.Width = 120;
-                    lblProgressText.Text = "Đang giải nén QuinGM luv Mthu Menu.exe vào ổ " + driveRoot + "...";
-                }
-                else if (step == 25)
-                {
-                    // Trích xuất file thực thi chính từ resource
                     try
                     {
-                        string targetExe = Path.Combine(driveRoot, "QuinGM luv Mthu Menu.exe");
-                        ExtractPayload(targetExe);
+                        if (!Directory.Exists(installDir)) Directory.CreateDirectory(installDir);
+                    }
+                    catch { }
+
+                    progressFill.Width = 110;
+                    lblProgressText.Text = "Đang giải nén QuinGM luv Mthu Menu.exe...";
+                }
+                else if (step == 22)
+                {
+                    // 1. Trích xuất file thực thi chính từ resource vào thư mục cài đặt QuinGM
+                    try
+                    {
+                        string targetExe = Path.Combine(installDir, "QuinGM luv Mthu Menu.exe");
+                        ExtractPayload("app_payload.bin", targetExe);
                     }
                     catch (Exception ex)
                     {
@@ -463,33 +489,42 @@ namespace QuinGM.Installer
                         return;
                     }
 
-                    progressFill.Width = 280;
+                    progressFill.Width = 240;
+                    lblProgressText.Text = "Đang tạo công cụ Gỡ Cài Đặt bên trong thư mục cài đặt...";
+                }
+                else if (step == 34)
+                {
+                    // 2. Trích xuất file Gỡ Cài Đặt bên trong thư mục cài đặt QuinGM
+                    try
+                    {
+                        string targetUninstaller = Path.Combine(installDir, "Gỡ Cài Đặt QuinGM.exe");
+                        ExtractPayload("uninstall_payload.bin", targetUninstaller);
+                    }
+                    catch { }
+
+                    progressFill.Width = 360;
                     lblProgressText.Text = "Đang tạo khoá định mệnh [anhyeuempmt.tag] ở chế độ ẨN (Hidden)...";
                 }
-                else if (step == 38)
+                else if (step == 42)
                 {
+                    // 3. Tạo khoá định mệnh ẩn
                     if (chkCreateTag.Checked)
                     {
-                        try
-                        {
-                            string tagPath = Path.Combine(driveRoot, "anhyeuempmt.tag");
-                            File.WriteAllText(tagPath, "Anh_Yeu_Em_Pham_Minh_Thu_Ksenia_Rin_Luv_U", System.Text.Encoding.UTF8);
-                            // Đặt thuộc tính Ẩn bí mật (Hidden + System)
-                            File.SetAttributes(tagPath, FileAttributes.Hidden | FileAttributes.System);
-                        }
-                        catch { }
+                        CreateHiddenTagFile(Path.Combine(installDir, "anhyeuempmt.tag"));
+                        CreateHiddenTagFile(Path.Combine(driveRoot, "anhyeuempmt.tag"));
                     }
 
-                    progressFill.Width = 420;
+                    progressFill.Width = 440;
                     lblProgressText.Text = "Đang tạo lối tắt bản quyền ra màn hình Desktop...";
                 }
-                else if (step == 48)
+                else if (step == 50)
                 {
+                    // 4. Tạo lối tắt Desktop
                     if (chkCreateShortcut.Checked)
                     {
                         try
                         {
-                            string targetExe = Path.Combine(driveRoot, "QuinGM luv Mthu Menu.exe");
+                            string targetExe = Path.Combine(installDir, "QuinGM luv Mthu Menu.exe");
                             string shortcutPath = GetDesktopShortcutPath();
 
                             Type shellType = Type.GetTypeFromProgID("WScript.Shell");
@@ -498,7 +533,7 @@ namespace QuinGM.Installer
                                 dynamic shell = Activator.CreateInstance(shellType);
                                 dynamic shortcut = shell.CreateShortcut(shortcutPath);
                                 shortcut.TargetPath = targetExe;
-                                shortcut.WorkingDirectory = Path.GetDirectoryName(targetExe);
+                                shortcut.WorkingDirectory = installDir;
                                 shortcut.IconLocation = targetExe + ",0";
                                 shortcut.Description = "QuinGM luv Mthu Menu (Portable Gaming & PMT Click)";
                                 shortcut.Save();
@@ -511,22 +546,25 @@ namespace QuinGM.Installer
                     lblProgressText.Text = "🎉 CÀI ĐẶT HOÀN TẤT THÀNH CÔNG 100%!";
                     lblProgressText.ForeColor = Color.FromArgb(74, 222, 128);
                 }
-                else if (step >= 55)
+                else if (step >= 56)
                 {
                     animTimer.Stop();
                     animTimer.Dispose();
 
                     btnInstall.Enabled = true;
                     btnLaunch.Enabled = true;
+                    btnOpenFolder.Enabled = true;
                     RefreshDrives();
                     CheckDesktopStatus();
 
                     MessageBox.Show(
                         "🎉 ĐÃ CÀI ĐẶT ỨNG DỤNG THÀNH CÔNG!\n\n" +
-                        "• Ứng dụng đã cài đặt tại: " + Path.Combine(driveRoot, "QuinGM luv Mthu Menu.exe") + "\n" +
-                        "• Khoá định mệnh [anhyeuempmt.tag] đã được tạo ở CHẾ ĐỘ ẨN (Hidden) trên ổ " + driveRoot + " để bảo mật tuyệt đối!\n" +
-                        "• Phím tắt Desktop đã được tạo thành công!\n\n" +
-                        "Bây giờ bạn có thể bấm 'Mở Game' để chơi ngay!",
+                        "• Thư mục cài đặt: " + installDir + "\n" +
+                        "• File ứng dụng: QuinGM luv Mthu Menu.exe\n" +
+                        "• File gỡ cài đặt: Gỡ Cài Đặt QuinGM.exe (nằm bên trong thư mục cài đặt để bạn gỡ sạch bất kỳ lúc nào)\n" +
+                        "• Khoá định mệnh [anhyeuempmt.tag] đã được tạo ở CHẾ ĐỘ ẨN (Hidden) để bảo mật tuyệt đối!\n" +
+                        "• Phím tắt Desktop đã được tạo sẵn sàng!\n\n" +
+                        "Bây giờ bạn có thể bấm 'Mở Game' để trải nghiệm ngay!",
                         "Cài Đặt Hoàn Tất",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
@@ -535,10 +573,10 @@ namespace QuinGM.Installer
             animTimer.Start();
         }
 
-        private void ExtractPayload(string targetPath)
+        private void ExtractPayload(string resourceName, string targetPath)
         {
             System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
-            using (Stream s = asm.GetManifestResourceStream("app_payload.bin"))
+            using (Stream s = asm.GetManifestResourceStream(resourceName))
             {
                 if (s != null)
                 {
@@ -555,78 +593,46 @@ namespace QuinGM.Installer
                 }
             }
 
-            // Fallback nếu chạy trực tiếp từ repo hoặc folder
-            string localExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "QuinGM luv Mthu Menu.exe");
-            if (File.Exists(localExe))
+            // Fallback nếu chạy trực tiếp từ repo hoặc thư mục biên dịch
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            if (resourceName == "app_payload.bin")
             {
-                File.Copy(localExe, targetPath, true);
-                return;
+                string localExe = Path.Combine(baseDir, "QuinGM luv Mthu Menu.exe");
+                if (File.Exists(localExe)) { File.Copy(localExe, targetPath, true); return; }
+
+                string binExe = Path.Combine(baseDir, "bin", "GMMenu.exe");
+                if (File.Exists(binExe)) { File.Copy(binExe, targetPath, true); return; }
+            }
+            else if (resourceName == "uninstall_payload.bin")
+            {
+                string localUn = Path.Combine(baseDir, "Gỡ Cài Đặt QuinGM.exe");
+                if (File.Exists(localUn)) { File.Copy(localUn, targetPath, true); return; }
+
+                string binUn = Path.Combine(baseDir, "bin", "Uninstall.exe");
+                if (File.Exists(binUn)) { File.Copy(binUn, targetPath, true); return; }
             }
 
-            string binExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "GMMenu.exe");
-            if (File.Exists(binExe))
-            {
-                File.Copy(binExe, targetPath, true);
-                return;
-            }
-
-            throw new FileNotFoundException("Không tìm thấy gói cài đặt ứng dụng nhúng trong file!");
+            throw new FileNotFoundException("Không tìm thấy tài nguyên nhúng: " + resourceName);
         }
 
-        private void BtnUninstall_Click(object sender, EventArgs e)
+        private void OpenInstallFolder()
         {
-            DialogResult confirm = MessageBox.Show(
-                "Bạn có chắc muốn gỡ phím tắt QuinGM luv Mthu Menu khỏi màn hình Desktop máy tính này không?\n(Dữ liệu game trên ổ di động vẫn được bảo toàn nguyên vẹn 100%)",
-                "Xác Nhận Gỡ Bỏ",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
+            DriveItem item = cboDrives.SelectedItem as DriveItem;
+            string driveRoot = (item != null) ? item.Root : "E:\\";
+            string installDir = Path.Combine(driveRoot, "QuinGM");
 
-            if (confirm != DialogResult.Yes) return;
+            if (!Directory.Exists(installDir))
+            {
+                installDir = driveRoot;
+            }
 
             try
             {
-                string[] possibleDesktopPaths = new string[]
-                {
-                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Desktop"),
-                    @"C:\Users\trung\Desktop",
-                    Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)
-                };
-
-                foreach (string dPath in possibleDesktopPaths)
-                {
-                    if (string.IsNullOrEmpty(dPath) || !Directory.Exists(dPath)) continue;
-                    try
-                    {
-                        foreach (string sc in Directory.GetFiles(dPath, "*QuinGM*.lnk"))
-                        {
-                            try { File.Delete(sc); } catch { }
-                        }
-                    }
-                    catch { }
-                }
-
-                try
-                {
-                    string appDataRoaming = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QuinGM");
-                    if (Directory.Exists(appDataRoaming)) Directory.Delete(appDataRoaming, true);
-                }
-                catch { }
-
-                CheckDesktopStatus();
-
-                MessageBox.Show(
-                    "🧹 ĐÃ DỌN SẠCH DẤU VẾT THÀNH CÔNG!\n\n" +
-                    "• Đã gỡ bỏ phím tắt trên Desktop máy tính.\n" +
-                    "• Đã dọn sạch bộ nhớ đệm tạm thời.\n\n" +
-                    "Máy tính đã hoàn toàn sạch sẽ an toàn!",
-                    "Đã Gỡ Bỏ",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                Process.Start("explorer.exe", installDir);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi gỡ: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Không thể mở thư mục: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -634,8 +640,13 @@ namespace QuinGM.Installer
         {
             DriveItem item = cboDrives.SelectedItem as DriveItem;
             string driveRoot = (item != null) ? item.Root : "E:\\";
-            string exePath = Path.Combine(driveRoot, "QuinGM luv Mthu Menu.exe");
+            string installDir = Path.Combine(driveRoot, "QuinGM");
+            string exePath = Path.Combine(installDir, "QuinGM luv Mthu Menu.exe");
 
+            if (!File.Exists(exePath))
+            {
+                exePath = Path.Combine(driveRoot, "QuinGM luv Mthu Menu.exe");
+            }
             if (!File.Exists(exePath))
             {
                 string localExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "QuinGM luv Mthu Menu.exe");
@@ -656,7 +667,7 @@ namespace QuinGM.Installer
             }
             else
             {
-                MessageBox.Show("Chưa cài đặt app vào ổ " + driveRoot + "!\nVui lòng bấm 'CÀI ĐẶT APP' trước khi mở.", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Chưa cài đặt app vào ổ " + driveRoot + "!\nVui lòng bấm 'OK - BẮT ĐẦU CÀI ĐẶT APP' trước khi mở.", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

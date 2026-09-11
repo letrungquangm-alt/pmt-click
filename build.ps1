@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 Set-Location $PSScriptRoot
 
@@ -109,7 +109,7 @@ Copy-Item "bin\Installer.exe" (Join-Path "E:\" $installerName) -Force
 
 # Don dep sach se tat ca file trung lap hoac loi font
 Get-ChildItem -Path "E:\" | Where-Object { ($_.Name -like "*Cai Dat QuinGM*" -or $_.Name -like "*C*i*t*QuinGM*") -and $_.Name -ne $installerName } | Remove-Item -Force -ErrorAction SilentlyContinue
-Get-ChildItem -Path $PSScriptRoot | Where-Object { ($_.Name -like "*Cai Dat QuinGM*" -or $_.Name -like "*C*i*t*QuinGM*") -and $_.Name -ne $installerName } | Remove-Item -Force -ErrorAction SilentlyContinue
+Get-ChildItem -Path $PSScriptRoot | Where-Object { ($_.Name -like "*Cai Dat QuinGM*" -or $_.Name -like "*C*i*t*QuinGM*") -and $_.Name -ne $installerName -and $_.Name -ne $uninstallerName } | Remove-Item -Force -ErrorAction SilentlyContinue
 
 # Don dep file test neu co
 if (Test-Path "test_install.ps1") { Remove-Item "test_install.ps1" -Force -ErrorAction SilentlyContinue }

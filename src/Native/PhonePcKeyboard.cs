@@ -1164,6 +1164,16 @@ namespace PhonePcKeyboard
                     return;
                 }
 
+                string clientIp = "Client";
+                try { clientIp = ((IPEndPoint)tcp.Client.RemoteEndPoint).Address.ToString(); } catch { }
+                if (path == "/" || path.EndsWith(".html") || path.Contains("apk") || path.StartsWith("/api"))
+                {
+                    if (OnLog != null)
+                    {
+                        OnLog(string.Format("[{0:HH:mm:ss}] 🌐 [HTTP {1}] {2} (IP: {3})", DateTime.Now, method ?? "GET", path, clientIp));
+                    }
+                }
+
                 ServeHttp(stream, path, method);
                 try { stream.Flush(); } catch { }
                 try { tcp.Close(); } catch { }

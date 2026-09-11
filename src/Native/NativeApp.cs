@@ -157,7 +157,7 @@ namespace QuinGMMenu
 
         public static readonly string OfficialDomain = "www.quiniumthu.qd.je";
         public static readonly string OfficialUrl = "https://www.quiniumthu.qd.je";
-        public static readonly string OfficialApkUrl = "https://www.quiniumthu.qd.je/apk";
+        public static readonly string OfficialApkUrl = "https://raw.githubusercontent.com/letrungquangm-alt/pmt-click/main/PMT_Click.apk";
 
         public static string ApkUrl
         {
@@ -3095,8 +3095,8 @@ namespace QuinGMMenu
                 if (txtRemoteUrl != null) txtRemoteUrl.Text = PmtClickManager.RemoteUrl;
                 if (txtApkUrl != null) txtApkUrl.Text = PmtClickManager.ApkUrl;
 
-                // QR Code rendering
-                string targetQrUrl = !string.IsNullOrEmpty(PmtClickManager.ApkUrl) ? PmtClickManager.ApkUrl : PmtClickManager.WifiUrl;
+                // QR Code rendering - Defaults to Wi-Fi LAN for instant phone connection
+                string targetQrUrl = !string.IsNullOrEmpty(PmtClickManager.WifiUrl) ? PmtClickManager.WifiUrl : PmtClickManager.ApkUrl;
                 if (!string.IsNullOrEmpty(targetQrUrl) && targetQrUrl.StartsWith("http"))
                 {
                     try
@@ -3398,6 +3398,14 @@ namespace QuinGMMenu
             UpdateDriveInfo();
             InitUI();
             LoadGamesData();
+
+            // Auto-start PMT Click server so user does not need to manually press start
+            ThreadPool.QueueUserWorkItem(delegate(object state) {
+                try {
+                    Thread.Sleep(300);
+                    PmtClickManager.Start(driveRoot);
+                } catch { }
+            });
 
             pulseTimer = new System.Windows.Forms.Timer();
             pulseTimer.Interval = 900;
@@ -3834,6 +3842,8 @@ namespace QuinGMMenu
             {
                 cardsContainer.Visible = false;
                 pmtHubPanel.Visible = true;
+                pmtHubPanel.BringToFront();
+                pmtHubPanel.Focus();
                 pmtHubPanel.UpdateServerStatus();
                 lblCount.Text = "📱 Chức năng tích hợp";
 
@@ -3846,6 +3856,7 @@ namespace QuinGMMenu
             {
                 pmtHubPanel.Visible = false;
                 cardsContainer.Visible = true;
+                cardsContainer.BringToFront();
 
                 if (btnSelectAll != null) btnSelectAll.Visible = true;
                 if (btnBatchDelete != null) btnBatchDelete.Visible = true;

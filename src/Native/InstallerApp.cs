@@ -11,6 +11,7 @@ namespace QuinGM.Installer
     public class InstallerForm : Form
     {
         private ComboBox cboDrives;
+        private Label lblHint;
         private Label lblTagStatus;
         private Label lblDesktopStatus;
         private CheckBox chkCreateTag;
@@ -28,7 +29,7 @@ namespace QuinGM.Installer
         public InstallerForm()
         {
             this.Text = "Trình Cài Đặt QuinGM luv Mthu Menu";
-            this.Size = new Size(620, 520);
+            this.Size = new Size(620, 540);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -101,7 +102,7 @@ namespace QuinGM.Installer
             };
             lblHeaderSub = new Label
             {
-                Text = "Đóng gói trọn bộ: Cài đặt ứng dụng vào ổ đĩa di động & tạo phím tắt Desktop",
+                Text = "Tự động phát hiện ổ đĩa di động • Cài đặt app • Tạo khoá định mệnh ẩn",
                 Font = new Font("Segoe UI", 9F, FontStyle.Regular),
                 ForeColor = Color.FromArgb(200, 180, 195),
                 AutoSize = true,
@@ -115,7 +116,7 @@ namespace QuinGM.Installer
             cardBox = new Panel
             {
                 Location = new Point(25, 98),
-                Size = new Size(555, 270),
+                Size = new Size(555, 290),
                 BackColor = Color.FromArgb(24, 16, 24)
             };
             cardBox.Paint += (s, e) => {
@@ -127,7 +128,7 @@ namespace QuinGM.Installer
 
             Label lblStep1 = new Label
             {
-                Text = "📁 Bước 1: Chọn ổ đĩa đích để cài đặt app (USB / Ổ di động):",
+                Text = "🔍 BƯỚC 1: HỆ THỐNG ĐÃ TỰ QUÉT & CHỌN Ổ ĐĨA ĐỀ XUẤT:",
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(255, 210, 225),
                 Location = new Point(18, 14),
@@ -137,7 +138,7 @@ namespace QuinGM.Installer
 
             cboDrives = new ComboBox
             {
-                Location = new Point(22, 42),
+                Location = new Point(22, 40),
                 Size = new Size(395, 30),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 BackColor = Color.FromArgb(36, 20, 32),
@@ -150,7 +151,7 @@ namespace QuinGM.Installer
             Button btnRefresh = new Button
             {
                 Text = "🔄 Quét lại",
-                Location = new Point(425, 41),
+                Location = new Point(425, 39),
                 Size = new Size(110, 30),
                 BackColor = Color.FromArgb(45, 25, 40),
                 ForeColor = Color.FromArgb(245, 180, 205),
@@ -162,10 +163,20 @@ namespace QuinGM.Installer
             btnRefresh.Click += (s, e) => { RefreshDrives(); CheckDesktopStatus(); };
             cardBox.Controls.Add(btnRefresh);
 
+            lblHint = new Label
+            {
+                Text = "👉 Nếu ĐÚNG ổ bạn muốn: Bấm [OK - CÀI ĐẶT APP] bên dưới.\n👉 Nếu SAI: Bạn bấm menu ở trên để tự chọn lại ổ đĩa khác theo ý muốn.",
+                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
+                ForeColor = Color.FromArgb(254, 202, 202),
+                Location = new Point(22, 76),
+                Size = new Size(515, 34)
+            };
+            cardBox.Controls.Add(lblHint);
+
             lblTagStatus = new Label
             {
-                Location = new Point(22, 80),
-                Size = new Size(510, 38),
+                Location = new Point(22, 114),
+                Size = new Size(515, 36),
                 Font = new Font("Segoe UI", 9F),
                 Text = "Đang kiểm tra ổ đĩa..."
             };
@@ -174,30 +185,30 @@ namespace QuinGM.Installer
             // Options
             chkCreateTag = new CheckBox
             {
-                Text = "Tạo khoá định mệnh [anhyeuempmt.tag] trên ổ đĩa nếu chưa có",
+                Text = "🔒 Tự động tạo khoá định mệnh [anhyeuempmt.tag] ở chế độ ẨN (Tàng hình)",
                 Checked = true,
-                Location = new Point(24, 122),
-                Size = new Size(500, 26),
-                Font = new Font("Segoe UI", 9.5F),
-                ForeColor = Color.FromArgb(240, 215, 230)
+                Location = new Point(24, 154),
+                Size = new Size(510, 25),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(255, 180, 205)
             };
             cardBox.Controls.Add(chkCreateTag);
 
             chkCreateShortcut = new CheckBox
             {
-                Text = "Tạo phím tắt ngoài màn hình Desktop máy tính này",
+                Text = "🖥️ Tạo phím tắt bản quyền ngoài màn hình Desktop máy tính này",
                 Checked = true,
-                Location = new Point(24, 150),
-                Size = new Size(500, 26),
-                Font = new Font("Segoe UI", 9.5F),
-                ForeColor = Color.FromArgb(240, 215, 230)
+                Location = new Point(24, 180),
+                Size = new Size(510, 25),
+                Font = new Font("Segoe UI", 9F),
+                ForeColor = Color.FromArgb(230, 215, 225)
             };
             cardBox.Controls.Add(chkCreateShortcut);
 
             // Progress bar
             progressBg = new Panel
             {
-                Location = new Point(22, 188),
+                Location = new Point(22, 215),
                 Size = new Size(510, 8),
                 BackColor = Color.FromArgb(44, 20, 32),
                 Visible = false
@@ -213,8 +224,8 @@ namespace QuinGM.Installer
 
             lblProgressText = new Label
             {
-                Location = new Point(22, 202),
-                Size = new Size(510, 25),
+                Location = new Point(22, 228),
+                Size = new Size(510, 24),
                 Font = new Font("Segoe UI", 9F, FontStyle.Italic),
                 ForeColor = Color.FromArgb(250, 200, 215),
                 Text = "Sẵn sàng cài đặt ứng dụng vào ổ đĩa được chọn."
@@ -223,8 +234,8 @@ namespace QuinGM.Installer
 
             lblDesktopStatus = new Label
             {
-                Location = new Point(22, 232),
-                Size = new Size(510, 28),
+                Location = new Point(22, 256),
+                Size = new Size(510, 26),
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                 Text = "Đang kiểm tra trạng thái Desktop..."
             };
@@ -235,13 +246,13 @@ namespace QuinGM.Installer
             // Action Buttons
             btnInstall = new Button
             {
-                Text = "🚀 BẮT ĐẦU CÀI ĐẶT APP",
-                Location = new Point(25, 385),
-                Size = new Size(250, 50),
-                BackColor = Color.FromArgb(80, 22, 50),
-                ForeColor = Color.FromArgb(255, 230, 242),
+                Text = "✅ OK - BẮT ĐẦU CÀI ĐẶT APP 💕",
+                Location = new Point(25, 405),
+                Size = new Size(260, 52),
+                BackColor = Color.FromArgb(85, 22, 55),
+                ForeColor = Color.FromArgb(255, 230, 245),
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
             btnInstall.FlatAppearance.BorderColor = Color.FromArgb(245, 95, 140);
@@ -251,8 +262,8 @@ namespace QuinGM.Installer
             btnUninstall = new Button
             {
                 Text = "🗑️ Gỡ Khỏi Desktop",
-                Location = new Point(285, 385),
-                Size = new Size(155, 50),
+                Location = new Point(295, 405),
+                Size = new Size(150, 52),
                 BackColor = Color.FromArgb(40, 18, 24),
                 ForeColor = Color.FromArgb(254, 202, 202),
                 FlatStyle = FlatStyle.Flat,
@@ -266,8 +277,8 @@ namespace QuinGM.Installer
             btnLaunch = new Button
             {
                 Text = "🎮 Mở Game",
-                Location = new Point(450, 385),
-                Size = new Size(130, 50),
+                Location = new Point(455, 405),
+                Size = new Size(125, 52),
                 BackColor = Color.FromArgb(32, 20, 32),
                 ForeColor = Color.FromArgb(240, 200, 220),
                 FlatStyle = FlatStyle.Flat,
@@ -285,6 +296,7 @@ namespace QuinGM.Installer
             public string Display { get; set; }
             public bool HasTag { get; set; }
             public bool HasApp { get; set; }
+            public bool IsRemovable { get; set; }
             public override string ToString() { return Display; }
         }
 
@@ -293,6 +305,7 @@ namespace QuinGM.Installer
             cboDrives.Items.Clear();
             int selectedIdx = 0;
             int currentIdx = 0;
+            int removableIdx = -1;
 
             foreach (DriveInfo d in DriveInfo.GetDrives())
             {
@@ -300,27 +313,36 @@ namespace QuinGM.Installer
                 string root = d.RootDirectory.FullName;
                 bool hasTag = CheckTagFile(root);
                 bool hasApp = File.Exists(Path.Combine(root, "QuinGM luv Mthu Menu.exe"));
+                bool isRemovable = (d.DriveType == DriveType.Removable || (!root.StartsWith("C:", StringComparison.OrdinalIgnoreCase) && root.Length >= 2));
 
                 string labelName = d.VolumeLabel;
                 if (string.IsNullOrEmpty(labelName)) labelName = "Ổ đĩa";
 
                 string stateDesc = "";
-                if (hasTag && hasApp) stateDesc = "💖 ĐÃ CÀI ĐẶT APP & CÓ KHOÁ ĐỊNH MỆNH";
-                else if (hasTag) stateDesc = "💖 Có thẻ khoá định mệnh";
-                else if (hasApp) stateDesc = "Đã có file app";
-                else stateDesc = "Chưa cài đặt";
+                if (hasTag && hasApp) stateDesc = "💖 Đã có App & Khoá định mệnh";
+                else if (hasTag) stateDesc = "💖 Đã có Khoá định mệnh";
+                else if (hasApp) stateDesc = "Đã có file App";
+                else stateDesc = "Sẵn sàng cài đặt";
 
                 string display = string.Format("{0} [{1}] ({2})", root, labelName, stateDesc);
-                DriveItem item = new DriveItem { Root = root, Display = display, HasTag = hasTag, HasApp = hasApp };
+                DriveItem item = new DriveItem { Root = root, Display = display, HasTag = hasTag, HasApp = hasApp, IsRemovable = isRemovable };
                 cboDrives.Items.Add(item);
 
+                // Ưu tiên chọn: ổ có tag trước, sau đó ổ E:\ hoặc ổ Removable
                 if (hasTag && selectedIdx == 0) selectedIdx = currentIdx;
+                else if (removableIdx == -1 && root.StartsWith("E:", StringComparison.OrdinalIgnoreCase)) removableIdx = currentIdx;
+                else if (removableIdx == -1 && isRemovable) removableIdx = currentIdx;
+
                 currentIdx++;
             }
 
             if (cboDrives.Items.Count > 0)
             {
-                cboDrives.SelectedIndex = selectedIdx;
+                int finalIdx = 0;
+                if (selectedIdx > 0 || (cboDrives.Items[0] as DriveItem).HasTag) finalIdx = selectedIdx;
+                else if (removableIdx >= 0) finalIdx = removableIdx;
+
+                cboDrives.SelectedIndex = finalIdx;
             }
             CheckSelectedDriveTag();
         }
@@ -357,21 +379,21 @@ namespace QuinGM.Installer
 
             if (item.HasTag && appExists)
             {
-                lblTagStatus.Text = "✅ Ổ đĩa này đã cài đặt app và có khoá định mệnh hợp lệ!\nBạn có thể bấm Cài đặt lại để cập nhật bản mới nhất hoặc Mở Game ngay.";
+                lblTagStatus.Text = "✅ Ổ đĩa " + item.Root + " đã có app & khoá định mệnh ẩn hợp lệ!\nBấm [CẬP NHẬT APP] nếu muốn cài lại bản mới nhất.";
                 lblTagStatus.ForeColor = Color.FromArgb(74, 222, 128);
-                btnInstall.Text = "🔄 CÀI ĐẶT / CẬP NHẬT APP";
+                btnInstall.Text = "🔄 OK - CẬP NHẬT APP 💕";
             }
             else if (item.HasTag)
             {
-                lblTagStatus.Text = "💖 Đã có khoá định mệnh [anhyeuempmt.tag]!\nBấm Cài Đặt bên dưới để giải nén ứng dụng vào ổ đĩa này.";
+                lblTagStatus.Text = "💖 Ổ đĩa " + item.Root + " đã có khoá định mệnh ẩn sẵn sàng.\nBấm [CÀI ĐẶT APP] để giải nén ứng dụng.";
                 lblTagStatus.ForeColor = Color.FromArgb(245, 95, 140);
-                btnInstall.Text = "🚀 BẮT ĐẦU CÀI ĐẶT APP";
+                btnInstall.Text = "✅ OK - BẮT ĐẦU CÀI ĐẶT APP 💕";
             }
             else
             {
-                lblTagStatus.Text = "💡 Ổ đĩa sẵn sàng cài đặt. Trình cài đặt sẽ tự động tạo thẻ định danh và giải nén app.";
+                lblTagStatus.Text = "💡 Ổ đĩa " + item.Root + " sẵn sàng cài đặt. Trình cài đặt sẽ tự động tạo khoá định mệnh ẩn.";
                 lblTagStatus.ForeColor = Color.FromArgb(200, 190, 210);
-                btnInstall.Text = "🚀 BẮT ĐẦU CÀI ĐẶT APP";
+                btnInstall.Text = "✅ OK - BẮT ĐẦU CÀI ĐẶT APP 💕";
             }
             btnInstall.Enabled = true;
         }
@@ -442,7 +464,7 @@ namespace QuinGM.Installer
                     }
 
                     progressFill.Width = 280;
-                    lblProgressText.Text = "Đang kiểm tra và tạo khoá định mệnh [anhyeuempmt.tag]...";
+                    lblProgressText.Text = "Đang tạo khoá định mệnh [anhyeuempmt.tag] ở chế độ ẨN (Hidden)...";
                 }
                 else if (step == 38)
                 {
@@ -452,6 +474,8 @@ namespace QuinGM.Installer
                         {
                             string tagPath = Path.Combine(driveRoot, "anhyeuempmt.tag");
                             File.WriteAllText(tagPath, "Anh_Yeu_Em_Pham_Minh_Thu_Ksenia_Rin_Luv_U", System.Text.Encoding.UTF8);
+                            // Đặt thuộc tính Ẩn bí mật (Hidden + System)
+                            File.SetAttributes(tagPath, FileAttributes.Hidden | FileAttributes.System);
                         }
                         catch { }
                     }
@@ -500,9 +524,9 @@ namespace QuinGM.Installer
                     MessageBox.Show(
                         "🎉 ĐÃ CÀI ĐẶT ỨNG DỤNG THÀNH CÔNG!\n\n" +
                         "• Ứng dụng đã cài đặt tại: " + Path.Combine(driveRoot, "QuinGM luv Mthu Menu.exe") + "\n" +
-                        "• Khoá định mệnh [anhyeuempmt.tag] đã sẵn sàng trên ổ " + driveRoot + "\n" +
+                        "• Khoá định mệnh [anhyeuempmt.tag] đã được tạo ở CHẾ ĐỘ ẨN (Hidden) trên ổ " + driveRoot + " để bảo mật tuyệt đối!\n" +
                         "• Phím tắt Desktop đã được tạo thành công!\n\n" +
-                        "Bây giờ bạn có thể mở game chơi ngay lập tức!",
+                        "Bây giờ bạn có thể bấm 'Mở Game' để chơi ngay!",
                         "Cài Đặt Hoàn Tất",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);

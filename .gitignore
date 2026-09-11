@@ -5,3 +5,5 @@ bin/
 scratch*
 *.log
 *.idsig
+ftp_config.txt
+cloudflare_token.txt

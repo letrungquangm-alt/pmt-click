@@ -3327,6 +3327,376 @@ namespace QuinGMMenu
         }
     }
 
+    public class DestinyKeyVerificationForm : Form
+    {
+        private enum ViewState
+        {
+            Searching,
+            Found,
+            NotFound
+        }
+
+        private ViewState currentState = ViewState.Searching;
+        private int remainingSeconds = 30;
+        private System.Windows.Forms.Timer countdownTimer;
+        private System.Windows.Forms.Timer scanTimer;
+        private System.Windows.Forms.Timer pulseIconTimer;
+        private float heartPulseScale = 1.0f;
+        private bool heartPulseGrowing = true;
+
+        private Label lblIcon;
+        private Label lblTitle;
+        private Label lblMessage;
+        private Label lblCountdown;
+        private Panel progressBarBg;
+        private Panel progressBarFill;
+        private Button btnAction;
+        private const int TotalSeconds = 30;
+
+        public DestinyKeyVerificationForm(bool isRuntimeReplug = false)
+        {
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Size = new Size(540, 370);
+            this.BackColor = Color.FromArgb(18, 12, 18);
+            this.TopMost = true;
+            this.DoubleBuffered = true;
+            this.Opacity = 0.0f;
+
+            InitUI();
+            SetState(ViewState.Searching);
+
+            // Giữ nhịp đập tìm kiếm 1.2 giây để người dùng trải nghiệm hiệu ứng tìm kiếm
+            System.Windows.Forms.Timer initialSearchTimer = new System.Windows.Forms.Timer { Interval = 1200 };
+            initialSearchTimer.Tick += (s, e) => {
+                initialSearchTimer.Stop();
+                initialSearchTimer.Dispose();
+                string foundRoot;
+                if (MainForm.FindPortableDriveWithTag(out foundRoot))
+                {
+                    SetState(ViewState.Found);
+                }
+                else
+                {
+                    StartContinuousScan();
+                }
+            };
+            initialSearchTimer.Start();
+
+            // Hiệu ứng Fade-in mờ dần hiện lên khi mở modal
+            this.Shown += (s, e) => {
+                System.Windows.Forms.Timer fadeIn = new System.Windows.Forms.Timer { Interval = 15 };
+                fadeIn.Tick += (s2, e2) => {
+                    if (this.Opacity < 0.98f)
+                    {
+                        this.Opacity += 0.08f;
+                    }
+                    else
+                    {
+                        this.Opacity = 1.0f;
+                        fadeIn.Stop();
+                        fadeIn.Dispose();
+                    }
+                };
+                fadeIn.Start();
+            };
+        }
+
+        private void InitUI()
+        {
+            lblIcon = new Label
+            {
+                Text = "💖",
+                Font = new Font("Segoe UI Emoji", 38F),
+                ForeColor = UITheme.NeonCoral,
+                Size = new Size(120, 75),
+                Location = new Point((this.Width - 120) / 2, 20),
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent
+            };
+
+            lblTitle = new Label
+            {
+                Text = "ĐANG TÌM KHOÁ ĐỊNH MỆNH...",
+                Font = new Font("Segoe UI", 13.5F, FontStyle.Bold),
+                ForeColor = UITheme.NeonCoral,
+                Size = new Size(500, 32),
+                Location = new Point(20, 98),
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent
+            };
+
+            lblMessage = new Label
+            {
+                Text = "Đang kết nối trái tim và quét tìm khoá định mệnh [anhyeuempmt.tag] trên các ổ đĩa...",
+                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
+                ForeColor = Color.FromArgb(240, 205, 215),
+                Size = new Size(480, 52),
+                Location = new Point(30, 134),
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent
+            };
+
+            lblCountdown = new Label
+            {
+                Text = "30s",
+                Font = new Font("Segoe UI", 32F, FontStyle.Bold),
+                ForeColor = UITheme.NeonAmber,
+                Size = new Size(200, 55),
+                Location = new Point((this.Width - 200) / 2, 185),
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent
+            };
+
+            progressBarBg = new Panel
+            {
+                Size = new Size(460, 6),
+                Location = new Point(40, 250),
+                BackColor = Color.FromArgb(44, 20, 28)
+            };
+
+            progressBarFill = new Panel
+            {
+                Size = new Size(460, 6),
+                Location = new Point(0, 0),
+                BackColor = UITheme.NeonAmber
+            };
+            progressBarBg.Controls.Add(progressBarFill);
+
+            btnAction = new Button
+            {
+                Text = "Hủy & Thoát",
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(254, 215, 226),
+                BackColor = Color.FromArgb(46, 18, 24),
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(220, 42),
+                Location = new Point((this.Width - 220) / 2, 280),
+                Cursor = Cursors.Hand
+            };
+            btnAction.FlatAppearance.BorderColor = Color.FromArgb(120, 44, 52);
+            btnAction.Click += BtnAction_Click;
+
+            this.Controls.Add(lblIcon);
+            this.Controls.Add(lblTitle);
+            this.Controls.Add(lblMessage);
+            this.Controls.Add(lblCountdown);
+            this.Controls.Add(progressBarBg);
+            this.Controls.Add(btnAction);
+
+            // Hiệu ứng nhịp đập trái tim đang tìm kiếm
+            pulseIconTimer = new System.Windows.Forms.Timer { Interval = 75 };
+            pulseIconTimer.Tick += (s, e) => {
+                if (currentState == ViewState.Searching)
+                {
+                    if (heartPulseGrowing)
+                    {
+                        heartPulseScale += 0.035f;
+                        if (heartPulseScale >= 1.18f) heartPulseGrowing = false;
+                    }
+                    else
+                    {
+                        heartPulseScale -= 0.035f;
+                        if (heartPulseScale <= 0.92f) heartPulseGrowing = true;
+                    }
+                    float baseSize = 38f * heartPulseScale;
+                    lblIcon.Font = new Font("Segoe UI Emoji", baseSize);
+                }
+            };
+            pulseIconTimer.Start();
+        }
+
+        private void StartContinuousScan()
+        {
+            if (currentState != ViewState.Searching) return;
+            countdownTimer = new System.Windows.Forms.Timer { Interval = 1000 };
+            countdownTimer.Tick += CountdownTimer_Tick;
+            countdownTimer.Start();
+
+            scanTimer = new System.Windows.Forms.Timer { Interval = 350 };
+            scanTimer.Tick += ScanTimer_Tick;
+            scanTimer.Start();
+        }
+
+        private void SetState(ViewState state)
+        {
+            currentState = state;
+            if (state == ViewState.Found)
+            {
+                StopTimers();
+                lblIcon.Font = new Font("Segoe UI Emoji", 44F);
+                lblIcon.Text = "🥰";
+                lblTitle.Text = "ĐÃ TÌM THẤY KHOÁ ĐỊNH MỆNH! 💕";
+                lblTitle.ForeColor = Color.FromArgb(255, 120, 160);
+
+                lblMessage.Text = "Đã tìm thấy khoá định mệnh rồi 💕\nChúc bạn sử dụng vui vẻ bên Minh Thư! 🌸✨";
+                lblMessage.ForeColor = Color.FromArgb(255, 230, 240);
+                lblMessage.Location = new Point(30, 145);
+                lblMessage.Size = new Size(480, 75);
+
+                lblCountdown.Visible = false;
+                progressBarBg.Visible = false;
+
+                btnAction.Text = "OK 💕";
+                btnAction.BackColor = Color.FromArgb(70, 22, 42);
+                btnAction.FlatAppearance.BorderColor = Color.FromArgb(245, 95, 140);
+                btnAction.ForeColor = Color.FromArgb(255, 235, 245);
+                btnAction.Size = new Size(220, 44);
+                btnAction.Location = new Point((this.Width - 220) / 2, 265);
+            }
+            else if (state == ViewState.NotFound)
+            {
+                StopTimers();
+                lblIcon.Font = new Font("Segoe UI Emoji", 44F);
+                lblIcon.Text = "😢";
+                lblTitle.Text = "KHÔNG TÌM THẤY KHOÁ ĐỊNH MỆNH...";
+                lblTitle.ForeColor = Color.FromArgb(248, 113, 113);
+
+                lblMessage.Text = "Không tìm thấy khoá định mệnh [anhyeuempmt.tag]... 💔\nỨng dụng sẽ tự huỷ và dọn sạch dấu vết trên máy tính để bảo mật.";
+                lblMessage.ForeColor = Color.FromArgb(254, 202, 202);
+                lblMessage.Location = new Point(30, 145);
+                lblMessage.Size = new Size(480, 75);
+
+                lblCountdown.Visible = false;
+                progressBarBg.Visible = false;
+
+                btnAction.Text = "OK 😢";
+                btnAction.BackColor = Color.FromArgb(50, 18, 22);
+                btnAction.FlatAppearance.BorderColor = Color.FromArgb(180, 40, 50);
+                btnAction.ForeColor = Color.FromArgb(254, 205, 215);
+                btnAction.Size = new Size(220, 44);
+                btnAction.Location = new Point((this.Width - 220) / 2, 265);
+            }
+            else // Searching
+            {
+                lblIcon.Text = "💖";
+                lblTitle.Text = "ĐANG TÌM KHOÁ ĐỊNH MỆNH...";
+                lblTitle.ForeColor = UITheme.NeonCoral;
+                lblMessage.Text = "Đang kết nối trái tim và quét tìm khoá định mệnh [anhyeuempmt.tag] trên các ổ đĩa...";
+                lblMessage.ForeColor = Color.FromArgb(240, 205, 215);
+                lblMessage.Location = new Point(30, 134);
+                lblMessage.Size = new Size(480, 52);
+
+                lblCountdown.Visible = true;
+                progressBarBg.Visible = true;
+
+                btnAction.Text = "Hủy & Thoát";
+                btnAction.BackColor = Color.FromArgb(46, 18, 24);
+                btnAction.FlatAppearance.BorderColor = Color.FromArgb(120, 44, 52);
+                btnAction.Size = new Size(200, 40);
+                btnAction.Location = new Point((this.Width - 200) / 2, 285);
+
+                remainingSeconds = TotalSeconds;
+            }
+
+            this.Invalidate();
+        }
+
+        private void StopTimers()
+        {
+            if (countdownTimer != null) { countdownTimer.Stop(); countdownTimer.Dispose(); countdownTimer = null; }
+            if (scanTimer != null) { scanTimer.Stop(); scanTimer.Dispose(); scanTimer = null; }
+        }
+
+        private void BtnAction_Click(object sender, EventArgs e)
+        {
+            if (currentState == ViewState.Found)
+            {
+                StartFadeOutAndClose(DialogResult.OK);
+            }
+            else if (currentState == ViewState.NotFound)
+            {
+                StartFadeOutAndClose(DialogResult.Abort);
+            }
+            else // Searching: user pressed "Hủy & Thoát"
+            {
+                SetState(ViewState.NotFound);
+            }
+        }
+
+        private void StartFadeOutAndClose(DialogResult result)
+        {
+            btnAction.Enabled = false;
+            if (pulseIconTimer != null) { pulseIconTimer.Stop(); pulseIconTimer.Dispose(); pulseIconTimer = null; }
+            System.Windows.Forms.Timer fadeTimer = new System.Windows.Forms.Timer { Interval = 15 };
+            fadeTimer.Tick += (s, e) => {
+                if (this.Opacity > 0.05f)
+                {
+                    this.Opacity -= 0.06f;
+                }
+                else
+                {
+                    fadeTimer.Stop();
+                    fadeTimer.Dispose();
+                    this.DialogResult = result;
+                    this.Close();
+                }
+            };
+            fadeTimer.Start();
+        }
+
+        private void ScanTimer_Tick(object sender, EventArgs e)
+        {
+            string foundRoot;
+            if (MainForm.FindPortableDriveWithTag(out foundRoot))
+            {
+                SetState(ViewState.Found);
+            }
+        }
+
+        private void CountdownTimer_Tick(object sender, EventArgs e)
+        {
+            remainingSeconds--;
+            if (remainingSeconds < 0) remainingSeconds = 0;
+
+            lblCountdown.Text = remainingSeconds + "s";
+
+            float pct = (float)remainingSeconds / TotalSeconds;
+            int newWidth = (int)(460 * pct);
+            if (newWidth < 0) newWidth = 0;
+            progressBarFill.Width = newWidth;
+
+            if (remainingSeconds <= 10)
+            {
+                lblCountdown.ForeColor = UITheme.NeonCoral;
+                progressBarFill.BackColor = UITheme.NeonCoral;
+            }
+
+            if (remainingSeconds <= 0)
+            {
+                SetState(ViewState.NotFound);
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            Color borderColor = Color.FromArgb(180, 255, 75, 95);
+            if (currentState == ViewState.Found)
+                borderColor = Color.FromArgb(200, 255, 120, 160);
+            else if (currentState == ViewState.NotFound)
+                borderColor = Color.FromArgb(200, 248, 113, 113);
+
+            using (Pen borderPen = new Pen(borderColor, 2f))
+            {
+                g.DrawRectangle(borderPen, 1, 1, this.Width - 2, this.Height - 2);
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                StopTimers();
+                if (pulseIconTimer != null) { pulseIconTimer.Dispose(); pulseIconTimer = null; }
+            }
+            base.Dispose(disposing);
+        }
+    }
+
     public class MainForm : Form
     {
         [DllImport("user32.dll")]
@@ -3364,20 +3734,7 @@ namespace QuinGMMenu
 
         public MainForm()
         {
-            string exePath = Application.ExecutablePath;
-            appDir = Path.GetDirectoryName(exePath);
-            if (appDir.EndsWith("bin\\", StringComparison.OrdinalIgnoreCase) || appDir.EndsWith("bin/", StringComparison.OrdinalIgnoreCase))
-            {
-                string parent = Directory.GetParent(appDir.TrimEnd('\\', '/')).FullName;
-                if (File.Exists(Path.Combine(parent, "games.json")))
-                {
-                    appDir = parent;
-                }
-            }
-            driveRoot = Path.GetPathRoot(appDir);
-            if (string.IsNullOrEmpty(driveRoot)) driveRoot = "E:\\";
-            portableDataDir = Path.Combine(appDir, "data");
-
+            ResolvePortableRoots();
             LoadAppIcon();
 
             this.Text = "QuinGM luv Mthu Menu (PORTABLE DESKTOP APP)";
@@ -3387,6 +3744,25 @@ namespace QuinGMMenu
             this.BackColor = UITheme.BgMain;
             this.ForeColor = Color.White;
             this.Font = new Font("Segoe UI", 10F, FontStyle.Regular);
+            this.Opacity = 0.0;
+
+            // Hiệu ứng Fade-in mượt mà khi mở Menu chính
+            this.Shown += (s, e) => {
+                System.Windows.Forms.Timer fadeInTimer = new System.Windows.Forms.Timer { Interval = 15 };
+                fadeInTimer.Tick += (s2, e2) => {
+                    if (this.Opacity < 0.98)
+                    {
+                        this.Opacity += 0.08;
+                    }
+                    else
+                    {
+                        this.Opacity = 1.0;
+                        fadeInTimer.Stop();
+                        fadeInTimer.Dispose();
+                    }
+                };
+                fadeInTimer.Start();
+            };
 
             this.Deactivate += (s, e) => NeonToolTipPopup.Instance.HidePopup();
             this.Move += (s, e) => NeonToolTipPopup.Instance.HidePopup();
@@ -3421,6 +3797,26 @@ namespace QuinGMMenu
                 {
                     lblStatus.Text = dot + " CHẾ ĐỘ PORTABLE: Ổ " + driveRoot + driveSpaceInfo + " (Dữ liệu cô lập 100% trên ổ di động)";
                     lblStatus.ForeColor = UITheme.NeonAmber;
+                }
+
+                // Kiểm tra liên tục: nếu ổ di động bị rút ra đột ngột
+                if (!IsMyPortableDrive(driveRoot))
+                {
+                    pulseTimer.Stop();
+                    using (DestinyKeyVerificationForm countdownForm = new DestinyKeyVerificationForm(true))
+                    {
+                        if (countdownForm.ShowDialog() == DialogResult.OK)
+                        {
+                            string newRoot;
+                            if (FindPortableDriveWithTag(out newRoot)) driveRoot = newRoot;
+                            pulseTimer.Start();
+                        }
+                        else
+                        {
+                            ExecuteSelfDestruct();
+                            return;
+                        }
+                    }
                 }
             };
             pulseTimer.Start();
@@ -3635,10 +4031,28 @@ namespace QuinGMMenu
             searchContainer.Controls.Add(searchIcon);
             searchContainer.Controls.Add(searchBox);
 
+            HeaderActionButton btnInstallDesktop = new HeaderActionButton
+            {
+                IconSymbol = "📌",
+                ButtonText = "Cài Ra Desktop",
+                Width = 142,
+                Height = 36,
+                NormalBg1 = Color.FromArgb(40, 20, 48),
+                NormalBg2 = Color.FromArgb(26, 12, 32),
+                HoverBg1 = Color.FromArgb(64, 30, 78),
+                HoverBg2 = Color.FromArgb(42, 18, 52),
+                NormalBorder = Color.FromArgb(130, 60, 180),
+                HoverBorder = UITheme.NeonAmber,
+                ForeColor = Color.FromArgb(235, 215, 255),
+                Margin = new Padding(0, 0, 8, 0)
+            };
+            btnInstallDesktop.Click += (s, e) => InstallToDesktop();
+
             headerRight.Controls.Add(btnSelectAll);
             headerRight.Controls.Add(btnBatchDelete);
             headerRight.Controls.Add(btnScan);
             headerRight.Controls.Add(btnAddApp);
+            headerRight.Controls.Add(btnInstallDesktop);
             headerRight.Controls.Add(searchContainer);
             header.Controls.Add(headerRight);
 
@@ -3891,9 +4305,234 @@ namespace QuinGMMenu
             }
         }
 
+        public static bool IsMyPortableDrive(string root)
+        {
+            if (string.IsNullOrEmpty(root)) return false;
+            try
+            {
+                // Chữ ký định danh độc quyền BẮT BUỘC: anhyeuempmt.tag
+                string loveTag = Path.Combine(root, "anhyeuempmt.tag");
+                if (File.Exists(loveTag))
+                {
+                    try
+                    {
+                        string content = File.ReadAllText(loveTag, Encoding.UTF8);
+                        if (content.IndexOf("Anh_Yeu_Em_Pham_Minh_Thu_Ksenia_Rin_Luv_U", StringComparison.OrdinalIgnoreCase) >= 0)
+                            return true;
+                    }
+                    catch { }
+                    return true;
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        public static bool FindPortableDriveWithTag(out string foundRoot)
+        {
+            foundRoot = null;
+            try
+            {
+                string appDir = Path.GetDirectoryName(Application.ExecutablePath);
+                if (IsMyPortableDrive(appDir))
+                {
+                    foundRoot = Path.GetPathRoot(appDir);
+                    return true;
+                }
+
+                string currentRoot = Path.GetPathRoot(appDir);
+                if (!string.IsNullOrEmpty(currentRoot) && IsMyPortableDrive(currentRoot))
+                {
+                    foundRoot = currentRoot;
+                    return true;
+                }
+
+                string[] preferredDrives = new string[] { "E:\\", "D:\\", "F:\\", "G:\\", "H:\\", "I:\\", "J:\\" };
+                foreach (string root in preferredDrives)
+                {
+                    if (IsMyPortableDrive(root))
+                    {
+                        foundRoot = root;
+                        return true;
+                    }
+                }
+
+                foreach (DriveInfo d in DriveInfo.GetDrives())
+                {
+                    if (!d.IsReady) continue;
+                    string root = d.RootDirectory.FullName;
+                    if (string.Equals(root, currentRoot, StringComparison.OrdinalIgnoreCase)) continue;
+
+                    if (IsMyPortableDrive(root))
+                    {
+                        foundRoot = root;
+                        return true;
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        private void ResolvePortableRoots()
+        {
+            string exePath = Application.ExecutablePath;
+            appDir = Path.GetDirectoryName(exePath);
+            if (string.IsNullOrEmpty(appDir)) appDir = "E:\\";
+
+            if (appDir.EndsWith("bin\\", StringComparison.OrdinalIgnoreCase) || appDir.EndsWith("bin/", StringComparison.OrdinalIgnoreCase))
+            {
+                string parent = Directory.GetParent(appDir.TrimEnd('\\', '/')).FullName;
+                if (File.Exists(Path.Combine(parent, "games.json")))
+                {
+                    appDir = parent;
+                }
+            }
+
+            string foundRoot;
+            if (FindPortableDriveWithTag(out foundRoot))
+            {
+                driveRoot = foundRoot;
+                appDir = foundRoot;
+            }
+            else
+            {
+                driveRoot = Path.GetPathRoot(appDir);
+                if (string.IsNullOrEmpty(driveRoot)) driveRoot = "E:\\";
+            }
+
+            portableDataDir = Path.Combine(driveRoot, "data");
+        }
+
+        public void InstallToDesktop()
+        {
+            try
+            {
+                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                if (string.IsNullOrEmpty(desktopPath) || !Directory.Exists(desktopPath))
+                {
+                    desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Desktop");
+                }
+
+                string exePath = Application.ExecutablePath;
+                if (!string.IsNullOrEmpty(driveRoot))
+                {
+                    string rootExe = Path.Combine(driveRoot, "QuinGM luv Mthu Menu.exe");
+                    if (File.Exists(rootExe)) exePath = rootExe;
+                }
+
+                string shortcutPath = Path.Combine(desktopPath, "QuinGM luv Mthu Menu.lnk");
+
+                Type shellType = Type.GetTypeFromProgID("WScript.Shell");
+                if (shellType != null)
+                {
+                    dynamic shell = Activator.CreateInstance(shellType);
+                    dynamic shortcut = shell.CreateShortcut(shortcutPath);
+                    shortcut.TargetPath = exePath;
+                    shortcut.WorkingDirectory = Path.GetDirectoryName(exePath);
+                    shortcut.IconLocation = exePath + ",0";
+                    shortcut.Description = "QuinGM luv Mthu Menu (Portable Gaming & PMT Click)";
+                    shortcut.Save();
+                }
+
+                MessageBox.Show(
+                    "ĐÃ CÀI ĐẶT RA DESKTOP THÀNH CÔNG!\n\n" +
+                    "• Lối tắt: " + shortcutPath + "\n" +
+                    "• Ổ đĩa di động: " + driveRoot + "\n\n" +
+                    "Bạn có thể mở game trực tiếp từ màn hình Desktop bất cứ lúc nào.\n" +
+                    "Lưu ý: Luôn cắm ổ cứng di động chứa thẻ [anhyeuempmt.tag] khi sử dụng!",
+                    "Cài Đặt Thành Công",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Không thể tạo lối tắt Desktop: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public static void ExecuteSelfDestruct()
+        {
+            try
+            {
+                // 1. Delete Desktop shortcut from all possible desktop locations
+                string[] possibleDesktopPaths = new string[]
+                {
+                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Desktop"),
+                    @"C:\Users\trung\Desktop",
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)
+                };
+
+                foreach (string dPath in possibleDesktopPaths)
+                {
+                    if (string.IsNullOrEmpty(dPath) || !Directory.Exists(dPath)) continue;
+                    try
+                    {
+                        foreach (string sc in Directory.GetFiles(dPath, "*QuinGM*.lnk"))
+                        {
+                            try { File.Delete(sc); } catch { }
+                        }
+                    }
+                    catch { }
+                }
+
+                // 2. If running directly from Desktop or C:\ drive, trigger self-delete script
+                string currentExe = Application.ExecutablePath;
+                string exeRoot = Path.GetPathRoot(currentExe);
+                bool isSystemDrive = string.Equals(exeRoot, "C:\\", StringComparison.OrdinalIgnoreCase);
+
+                if (isSystemDrive)
+                {
+                    try
+                    {
+                        string appDataRoaming = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QuinGM");
+                        if (Directory.Exists(appDataRoaming)) Directory.Delete(appDataRoaming, true);
+                    }
+                    catch { }
+
+                    try
+                    {
+                        ProcessStartInfo psi = new ProcessStartInfo();
+                        psi.FileName = "cmd.exe";
+                        psi.Arguments = string.Format("/c ping 127.0.0.1 -n 2 >nul & del /f /q \"{0}\"", currentExe);
+                        psi.WindowStyle = ProcessWindowStyle.Hidden;
+                        psi.CreateNoWindow = true;
+                        Process.Start(psi);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+            Environment.Exit(0);
+        }
+
+        private string GetGamesJsonPath()
+        {
+            if (!string.IsNullOrEmpty(appDir))
+            {
+                string p1 = Path.Combine(appDir, "games.json");
+                if (File.Exists(p1)) return p1;
+
+                string p2 = Path.Combine(appDir, "code", "code", "games.json");
+                if (File.Exists(p2)) return p2;
+            }
+
+            if (!string.IsNullOrEmpty(driveRoot))
+            {
+                string p3 = Path.Combine(driveRoot, "games.json");
+                if (File.Exists(p3)) return p3;
+
+                string p4 = Path.Combine(driveRoot, "code", "code", "games.json");
+                if (File.Exists(p4)) return p4;
+            }
+
+            return !string.IsNullOrEmpty(driveRoot) ? Path.Combine(driveRoot, "games.json") : "E:\\games.json";
+        }
+
         private void LoadGamesData()
         {
-            string jsonPath = Path.Combine(appDir, "games.json");
+            string jsonPath = GetGamesJsonPath();
             List<GameItem> loaded = new List<GameItem>();
 
             if (File.Exists(jsonPath))
@@ -3949,7 +4588,14 @@ namespace QuinGMMenu
             try
             {
                 string newJson = serializer.Serialize(allGames);
-                File.WriteAllText(Path.Combine(appDir, "games.json"), newJson, Encoding.UTF8);
+                string jsonPath = GetGamesJsonPath();
+                File.WriteAllText(jsonPath, newJson, Encoding.UTF8);
+                // If we are at root, keep code/code/games.json in sync as well
+                string subPath = Path.Combine(appDir, "code", "code", "games.json");
+                if (File.Exists(subPath) && !string.Equals(jsonPath, subPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    try { File.WriteAllText(subPath, newJson, Encoding.UTF8); } catch { }
+                }
             }
             catch { }
         }
@@ -4529,6 +5175,17 @@ namespace QuinGMMenu
                 Application.ThreadException += (s, ev) => {
                     try { File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash.log"), ev.Exception.ToString()); } catch {}
                 };
+
+                // Modal xác thực Khoá định mệnh (trái tim nhịp đập, mặt cười, mờ dần chuyển cảnh, tự huỷ)
+                using (DestinyKeyVerificationForm verifyForm = new DestinyKeyVerificationForm())
+                {
+                    if (verifyForm.ShowDialog() != DialogResult.OK)
+                    {
+                        MainForm.ExecuteSelfDestruct();
+                        return;
+                    }
+                }
+
                 try
                 {
                     Application.Run(new MainForm());

@@ -7,8 +7,8 @@ echo       ĐANG ĐẨY FILE APK VÀ DỰ ÁN LÊN GITHUB: letrungquangm-alt/pmt
 echo ================================================================================
 echo.
 echo Khi cửa sổ GitHub hiện lên, bạn chỉ cần chọn "Sign in with your browser"!
-"E:\Git\cmd\git.exe" add PMT_Click.apk static/PMT_Click.apk
-"E:\Git\cmd\git.exe" commit -m "Update PMT_Click.apk" >nul 2>&1
+"E:\Git\cmd\git.exe" add -A
+"E:\Git\cmd\git.exe" commit -m "Update QuinGM Menu: Khoa Dinh Menh, Installer & Portable features"
 "E:\Git\cmd\git.exe" push origin main
 echo.
 if %errorlevel% equ 0 (

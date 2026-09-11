@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMT Click • Tải Ứng Dụng Bàn Phím & Chuột PC Cho Android</title>
+    <meta name="description" content="Tải ứng dụng PMT Click cho Android (165 KB). Biến điện thoại thành bàn phím cơ và chuột trackpad điều khiển PC độ trễ dưới 1ms.">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #07090e;
+            --bg-card: rgba(16, 22, 34, 0.7);
+            --bg-card-hover: rgba(22, 30, 48, 0.85);
+            --border-glow: rgba(0, 240, 255, 0.22);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f0ff;
+            --neon-green: #00ff9d;
+            --neon-coral: #ff3366;
+            --text-title: #ffffff;
+            --text-body: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-body);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(0, 240, 255, 0.09) 0%, transparent 45%),
+                radial-gradient(circle at 90% 40%, rgba(255, 51, 102, 0.07) 0%, transparent 40%),
+                radial-gradient(circle at 10% 80%, rgba(0, 255, 157, 0.06) 0%, transparent 45%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header */
+        header {
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--border-subtle);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 9, 14, 0.88);
+        }
+        .nav-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            box-shadow: 0 0 14px rgba(0, 240, 255, 0.45);
+        }
+        .brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -0.5px;
+        }
+        .brand-title span {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        .btn-github {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-title);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-github:hover {
+            background: rgba(0, 240, 255, 0.12);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 4rem 0 3rem;
+            text-align: center;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: rgba(0, 255, 157, 0.08);
+            border: 1px solid rgba(0, 255, 157, 0.25);
+            color: var(--neon-green);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 1.4rem;
+        }
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--neon-green);
+        }
+
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.2;
+            color: var(--text-title);
+            margin-bottom: 1rem;
+            letter-spacing: -0.8px;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #00f0ff 0%, #00ff9d 60%, #ffb800 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            max-width: 620px;
+            margin: 0 auto 2.5rem;
+            color: var(--text-body);
+        }
+
+        /* Download Card */
+        .download-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 2.2rem 1.8rem;
+            max-width: 580px;
+            margin: 0 auto 3.5rem;
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(16px);
+            text-align: center;
+            position: relative;
+        }
+        .download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        }
+
+        .btn-download-apk {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #00f0ff 0%, #00ff9d 100%);
+            color: #040914;
+            padding: 1.15rem 1.8rem;
+            border-radius: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.22rem;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(0, 240, 255, 0.35);
+            transition: all 0.25s ease;
+        }
+        .btn-download-apk:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 38px rgba(0, 240, 255, 0.55);
+            color: #000;
+        }
+        .icon-down {
+            font-size: 1.5rem;
+        }
+
+        .file-specs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 1.3rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Features */
+        .features {
+            padding: 1.5rem 0 3rem;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 2.2rem;
+        }
+        .section-tag {
+            color: var(--neon-cyan);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-title);
+        }
+
+        .grid-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+        .card-feat {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.25s ease;
+        }
+        .card-feat:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-glow);
+            transform: translateY(-3px);
+        }
+        .card-feat-icon {
+            font-size: 1.6rem;
+            margin-bottom: 0.8rem;
+        }
+        .card-feat-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-bottom: 0.4rem;
+        }
+        .card-feat-text {
+            font-size: 0.9rem;
+            color: var(--text-body);
+            line-height: 1.5;
+        }
+
+        /* 3 Steps Guide */
+        .guide-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 2.2rem 1.8rem;
+            margin: 2rem 0 3.5rem;
+        }
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .guide-step {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .guide-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--neon-cyan);
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .guide-step h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-title);
+        }
+        .guide-step p {
+            font-size: 0.88rem;
+            color: var(--text-body);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-subtle);
+            padding: 2rem 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        footer a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2.2rem; }
+            .hero-desc { font-size: 1rem; }
+            .download-card { padding: 1.6rem 1.2rem; }
+            .btn-download-apk { font-size: 1.08rem; padding: 1rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <header>
+        <div class="container nav-wrap">
+            <a href="/" class="brand">
+                <img src="/logo.png" alt="PMT Click Logo" onerror="this.src='https://raw.githubusercontent.com/letrungquangm-alt/pmt-click/main/static/logo.png'">
+                <div class="brand-title">PMT <span>CLICK</span></div>
+            </a>
+            <a href="https://github.com/letrungquangm-alt/pmt-click" target="_blank" rel="noopener" class="btn-github">
+                <span>⭐</span> GitHub
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="badge">
+                <span class="pulse-dot"></span>
+                <span>BẢN NATIVE ANDROID v2.2 • MIỄN PHÍ</span>
+            </div>
+
+            <h1>Biến Điện Thoại Thành<br><span class="gradient-text">Bàn Phím Cơ & Chuột PC</span></h1>
+            
+            <p class="hero-desc">
+                Điều khiển máy tính độ trễ cực thấp (&lt; 1ms). Kết nối tức thì qua Wi-Fi hoặc 4G. Siêu nhẹ, mượt mà và an toàn 100%.
+            </p>
+
+            <!-- Only 1 Direct Download Button -->
+            <div class="download-card">
+                <a href="https://raw.githubusercontent.com/letrungquangm-alt/pmt-click/main/PMT_Click.apk" download="PMT_Click.apk" class="btn-download-apk" id="btn-apk">
+                    <span class="icon-down">📥</span>
+                    <span>TẢI VỀ APK CHO ANDROID (MIỄN PHÍ)</span>
+                </a>
+
+                <div class="file-specs">
+                    <span>📦 <strong>165 KB</strong></span>
+                    <span>•</span>
+                    <span>⚡ <strong>&lt; 1ms</strong></span>
+                    <span>•</span>
+                    <span>📱 <strong>Android 5.0+</strong></span>
+                    <span>•</span>
+                    <span>🛡️ <strong>100% Sạch</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Features -->
+        <section class="features">
+            <div class="section-header">
+                <div class="section-tag">Tính Năng</div>
+                <h2 class="section-title">Tại Sao Nên Dùng PMT Click?</h2>
+            </div>
+
+            <div class="grid-features">
+                <div class="card-feat">
+                    <div class="card-feat-icon">⌨️</div>
+                    <h3 class="card-feat-title">Bàn Phím Cơ Đầy Đủ</h3>
+                    <p class="card-feat-text">Đầy đủ F1-F12, Esc, Ctrl, Alt, Shift, phím Windows và cụm mũi tên. Gõ văn bản tiếng Việt và phím tắt game siêu nhạy.</p>
+                </div>
+
+                <div class="card-feat">
+                    <div class="card-feat-icon">🖱️</div>
+                    <h3 class="card-feat-title">Chuột Trackpad Cực Mượt</h3>
+                    <p class="card-feat-text">Chạm 1 ngón click trái, chạm 2 ngón click phải, vuốt 2 ngón để cuộn trang mượt mà như chuột laptop xịn.</p>
+                </div>
+
+                <div class="card-feat">
+                    <div class="card-feat-icon">⚡</div>
+                    <h3 class="card-feat-title">Độ Trễ Siêu Thấp &lt; 1ms</h3>
+                    <p class="card-feat-text">Truyền lệnh Win32 SendInput Native thời gian thực, phản hồi tức thì không giật lag.</p>
+                </div>
+
+                <div class="card-feat">
+                    <div class="card-feat-icon">📶</div>
+                    <h3 class="card-feat-title">Quét Mã QR Kết Nối</h3>
+                    <p class="card-feat-text">Mở app trên điện thoại và quét mã QR trên màn hình PC là kết nối xong trong 1 giây.</p>
+                </div>
+
+                <div class="card-feat">
+                    <div class="card-feat-icon">🔋</div>
+                    <h3 class="card-feat-title">Siêu Nhẹ & Tiết Kiệm Pin</h3>
+                    <p class="card-feat-text">Dung lượng chỉ 165 KB, chạy mượt mà trên mọi máy Android từ đời cũ đến đời mới.</p>
+                </div>
+
+                <div class="card-feat">
+                    <div class="card-feat-icon">🔒</div>
+                    <h3 class="card-feat-title">100% An Toàn & Portable</h3>
+                    <p class="card-feat-text">Hoạt động độc lập, không ghi rác hệ thống vào ổ C, không quảng cáo làm phiền.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3-Step Guide -->
+        <section class="guide-box">
+            <div class="section-header" style="margin-bottom: 1.2rem;">
+                <div class="section-tag">Bắt Đầu</div>
+                <h2 class="section-title">3 Bước Cài Đặt Đơn Giản</h2>
+            </div>
+
+            <div class="guide-grid">
+                <div class="guide-step">
+                    <div class="guide-num">1</div>
+                    <h4>Tải File APK</h4>
+                    <p>Bấm nút <strong>"Tải về APK cho Android"</strong> ở trên để tải file về điện thoại.</p>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num">2</div>
+                    <h4>Cài Đặt Ứng Dụng</h4>
+                    <p>Mở file vừa tải về và chọn <em>"Cho phép từ nguồn này"</em> nếu Android hỏi bảo mật.</p>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num">3</div>
+                    <h4>Quét QR & Sử Dụng</h4>
+                    <p>Mở app PMT Click, quét mã QR trên phần mềm máy tính và bắt đầu sử dụng ngay!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2026 <strong>PMT Click</strong> • Phát triển độc quyền bởi <strong>QuinGM luv Mthu Menu</strong>.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('btn-apk').addEventListener('click', function() {
+            const btn = this;
+            const origin = btn.innerHTML;
+            btn.innerHTML = '<span class="icon-down">⏳</span> <span>ĐANG BẮT ĐẦU TẢI XUỐNG...</span>';
+            setTimeout(() => {
+                btn.innerHTML = '<span class="icon-down">✅</span> <span>ĐÃ BẮT ĐẦU TẢI VỀ MÁY!</span>';
+                setTimeout(() => { btn.innerHTML = origin; }, 3500);
+            }, 800);
+        });
+    </script>
+</body>
+</html>

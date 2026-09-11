@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tải App PMT Click cho Android</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/logo.png">
+    <style>
+        :root {
+            --bg-main: #0a0c10;
+            --card-bg: #161a22;
+            --accent-cyan: #00e5ff;
+            --accent-green: #00ff9d;
+            --text-main: #f0f6fc;
+            --text-sub: #8b949e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 1.8rem 1.4rem;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 229, 255, 0.15);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .logo-box img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.7));
+            animation: bounce 2s infinite ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        h1 {
+            font-size: 1.6rem;
+            color: var(--accent-cyan);
+            letter-spacing: 1px;
+        }
+        .sub-desc {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+        .download-box {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            align-items: center;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-green);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .pulse {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+        .btn-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: linear-gradient(135deg, #00e5ff, #00ff9d);
+            color: #000;
+            text-decoration: none;
+            font-size: 1.05rem;
+            font-weight: 800;
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-download:active {
+            transform: scale(0.98);
+        }
+        .instructions {
+            text-align: left;
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        .instructions h3 {
+            font-size: 0.95rem;
+            color: #ffd700;
+            margin-bottom: 0.6rem;
+        }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 0.6rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #c9d1d9;
+        }
+        .step:last-child { margin-bottom: 0; }
+        .step-num {
+            background: #21262d;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .open-web-link {
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .open-web-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-box">
+            <img src="/logo.png" alt="PMT Click">
+        </div>
+        <h1>PMT CLICK</h1>
+        <p class="sub-desc">Ứng dụng Điều khiển Máy tính Siêu mượt cho Android</p>
+
+        <div class="download-box">
+            <a href="/" id="btn-install-app" class="btn-download" style="background: linear-gradient(135deg, #00e5ff, #00ff9d);">
+                📲 CÀI ĐẶT ỨNG DỤNG (1 CHẠM - KHUYÊN DÙNG)
+            </a>
+            <div class="status-badge" style="margin-top: 6px;">
+                <span class="pulse"></span>
+                <span id="status-text">Hoặc tải file cài đặt APK bên dưới:</span>
+            </div>
+            <a href="/download/PMT_Click.apk" id="btn-download" class="btn-download" style="background: #21262d; color: #fff; border: 1px solid #30363d; font-size: 0.95rem;" download="PMT_Click.apk">
+                ⬇️ TẢI TỆP PMT_CLICK.APK
+            </a>
+        </div>
+
+        <div class="instructions">
+            <h3>📖 Cách Cài Đặt Nhanh Nhất (100% Không Lỗi):</h3>
+            <div class="step">
+                <div class="step-num">1</div>
+                <div>Bấm nút <b>"Cài Đặt Ứng Dụng"</b> ở trên để mở giao diện điều khiển.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div>Bấm vào menu trình duyệt (<b>dấu 3 chấm ⋮</b> góc trên màn hình).</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div>Chọn <b>"Cài đặt ứng dụng"</b> (hoặc <b>"Thêm vào Màn hình chính"</b>) -> Biểu tượng <b>PMT Click</b> sẽ xuất hiện ngay trên màn hình điện thoại!</div>
+            </div>
+        </div>
+
+        <div>
+            <a href="/" class="open-web-link">🌐 Mở trực tiếp Bàn phím & Chuột PMT Click</a>
+        </div>
+    </div>
+
+    <script>
+        // Set dynamic cache-busting download URL
+        const freshApkUrl = '/download/PMT_Click.apk?t=' + new Date().getTime();
+        const btn = document.getElementById('btn-download');
+        if (btn) {
+            btn.href = freshApkUrl;
+        }
+
+        // Auto-trigger download after 400ms
+        setTimeout(() => {
+            if (btn) {
+                const downloadLink = document.createElement('a');
+                downloadLink.href = freshApkUrl;
+                downloadLink.download = 'PMT_Click.apk';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                document.getElementById('status-text').textContent = 'Nếu chưa tự tải, vui lòng bấm nút bên dưới:';
+            }
+        }, 400);
+    </script>
+</body>
+</html>

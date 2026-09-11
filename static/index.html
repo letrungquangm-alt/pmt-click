@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>PMT Click</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css?v=16.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="portrait-warning" class="portrait-warning">
+        <div class="warning-icon">🔄</div>
+        <h2>Vui lòng xoay ngang điện thoại</h2>
+        <p>Giao diện Hacker's Keyboard & Trackpad hoạt động tốt nhất ở chế độ nằm ngang (Landscape).</p>
+    </div>
+
+    <!-- Cyberpunk Loading Transition Screen (Chuyển cảnh kết nối mượt mà) -->
+    <div id="loading-transition-screen" class="loading-transition-overlay hide">
+        <div class="cyber-loading-box">
+            <!-- Rotating Holographic Cyber Hexagon Core -->
+            <div class="cyber-hexagon-wrapper">
+                <div class="cyber-hex-ring outer"></div>
+                <div class="cyber-hex-ring middle"></div>
+                <div class="cyber-hex-core">
+                    <img src="logo.png" alt="PMT" class="hex-logo">
+                </div>
+            </div>
+
+            <div class="loading-text-group">
+                <h3 id="loading-title" class="loading-title">ĐANG KẾT NỐI MÁY TÍNH</h3>
+                <p id="loading-subtitle" class="loading-subtitle">Khởi tạo đường truyền độ trễ siêu thấp (&lt; 1ms)...</p>
+            </div>
+
+            <!-- Glowing Cyber Progress Bar -->
+            <div class="cyber-progress-container">
+                <div id="cyber-progress-bar" class="cyber-progress-bar"></div>
+            </div>
+
+            <!-- Dynamic Cyber Status Steps -->
+            <div class="cyber-steps-list">
+                <div class="cyber-step" id="step-1">
+                    <span class="step-icon">📡</span>
+                    <span class="step-text" id="step-1-text">Dò tìm máy tính trên mạng Wi-Fi / STUN WebRTC...</span>
+                    <span class="step-status" id="step-1-status">⏳</span>
+                </div>
+                <div class="cyber-step" id="step-2">
+                    <span class="step-icon">💻</span>
+                    <span class="step-text" id="step-2-text">Bắt tay giao thức WebRTC P2P / WebSocket 60 FPS...</span>
+                    <span class="step-status" id="step-2-status">⋯</span>
+                </div>
+                <div class="cyber-step" id="step-3">
+                    <span class="step-icon">⚡</span>
+                    <span class="step-text" id="step-3-text">Kích hoạt Win32 SendInput Native (&lt;1ms)...</span>
+                    <span class="step-status" id="step-3-status">⋯</span>
+                </div>
+            </div>
+
+            <div id="loading-error-msg" class="loading-error-msg hide"></div>
+            <button id="btn-cancel-loading" class="btn-cancel-loading">✕ HỦY BỎ / QUAY LẠI</button>
+        </div>
+    </div>
+
+    <!-- Connection Disconnected Overlay Popup -->
+    <div id="disconnect-overlay" class="disconnect-overlay">
+        <div class="disconnect-card">
+            <div class="spinner"></div>
+            <h3>🔴 Mất kết nối với Máy tính</h3>
+            <p>Server trên PC đã dừng hoặc bị ngắt kết nối. Đang tự động kết nối lại khi bạn bật lại Server...</p>
+        </div>
+    </div>
+
+    <!-- Connection Hub Launcher Modal -->
+    <div id="connection-hub" class="connection-hub-overlay hide">
+        <div class="connection-hub-card">
+            <button id="btn-close-hub" class="btn-close-hub" title="Đóng bảng kết nối">✕</button>
+
+            <div class="hub-header">
+                <div class="hub-logo-container">
+                    <img src="logo.png" alt="PMT Click" class="hub-logo">
+                    <div class="hub-logo-glow"></div>
+                </div>
+                <h2>PMT CLICK</h2>
+                <p class="hub-subtitle">⚡ Trung Tâm Điều Khiển Không Dây Máy Tính ⚡</p>
+            </div>
+
+            <div class="hub-tabs">
+                <button id="tab-btn-wifi" class="hub-tab-btn active">📶 Wi-Fi Tự Động</button>
+                <button id="tab-btn-remote" class="hub-tab-btn">⚡ WebRTC / Mã ID</button>
+                <button id="tab-btn-manual" class="hub-tab-btn">⌨️ Nhập IP Trực Tiếp</button>
+            </div>
+
+            <!-- Tab 1: Wi-Fi Auto-Discovery -->
+            <div id="tab-pane-wifi" class="hub-tab-pane active">
+                <div class="radar-box">
+                    <div class="radar-sweep"></div>
+                    <div class="radar-ring r1"></div>
+                    <div class="radar-ring r2"></div>
+                    <div class="radar-center-dot"></div>
+                </div>
+                <div class="discovery-header">
+                    <span class="pulse-dot"></span>
+                    <span id="discovery-status-text">Đang quét tìm máy tính trong Wi-Fi...</span>
+                    <button id="btn-rescan-wifi" class="btn-rescan">🔄 Quét Lại</button>
+                </div>
+                <div id="discovered-pc-list" class="discovered-list">
+                    <!-- Dynamic PC Cards injected here -->
+                </div>
+                <div id="no-pc-hint" class="no-pc-hint">
+                    <p>💡 Đảm bảo máy tính đã mở phần mềm <b>PMT Click</b> và kết nối cùng mạng Wi-Fi.</p>
+                </div>
+            </div>
+
+            <!-- Tab 2: Remote 6-Digit ID & WebRTC P2P Direct -->
+            <div id="tab-pane-remote" class="hub-tab-pane hide">
+                <div class="remote-banner">
+                    <span class="badge-gold">⚡ KẾT NỐI TỪ XA 4G/5G QUA DOMAIN CHÍNH THỨC</span>
+                    <p>Nhập <b>Mã ID 6 số</b> hoặc kết nối trực tiếp qua Domain chính chủ:</p>
+                </div>
+                <div class="code-input-container">
+                    <input type="text" id="remote-id-input" class="remote-id-input" placeholder="quiniumthu.qd.je hoặc Mã 6 số" autocomplete="off">
+                    <button id="btn-connect-remote" class="btn-connect-remote">🚀 KẾT NỐI</button>
+                </div>
+                <div class="quick-ip-chips" style="margin-top: 10px;">
+                    <span class="chip-label">Domain chính thức:</span>
+                    <button class="ip-chip chip-primary" data-ip="quiniumthu.qd.je">🌐 quiniumthu.qd.je</button>
+                </div>
+                <div id="remote-status-msg" class="remote-status-msg"></div>
+            </div>
+
+            <!-- Tab 3: Manual Direct IP/URL -->
+            <div id="tab-pane-manual" class="hub-tab-pane hide">
+                <p class="remote-hint">Nhập domain hoặc địa chỉ IP máy tính (Ví dụ: <code>quiniumthu.qd.je</code> hoặc <code>192.168.1.10:5000</code>):</p>
+                <div class="manual-input-container">
+                    <input type="text" id="manual-host-input" class="manual-host-input" placeholder="quiniumthu.qd.je">
+                    <button id="btn-connect-manual" class="btn-connect-manual">🔗 KẾT NỐI</button>
+                </div>
+                <div class="quick-ip-chips">
+                    <span class="chip-label">Gợi ý nhanh:</span>
+                    <button class="ip-chip chip-primary" data-ip="quiniumthu.qd.je">🌐 quiniumthu.qd.je</button>
+                    <button class="ip-chip" data-ip="192.168.1.10:5000">192.168.1.10:5000</button>
+                    <button class="ip-chip" data-ip="192.168.1.2:5000">192.168.1.2:5000</button>
+                </div>
+            </div>
+
+            <div class="hub-footer">
+                <a href="PMT_Click.apk" class="apk-download-badge" download="PMT_Click.apk">
+                    📱 <span>Tải App Android APK (PMT Click)</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Stealth Trigger (Bật lại phím khi ở chế độ Ẩn 100%) -->
+    <div id="stealth-trigger" class="stealth-trigger" title="Bật lại giao diện phím">👁️</div>
+
+    <!-- Live PC Screen Desktop Streaming Layer (Hardware-Accelerated Canvas nền) -->
+    <canvas id="live-pc-screen" class="live-pc-screen hide"></canvas>
+
+    <div class="app-container" id="app-container">
+        <!-- Top Status Header -->
+        <header class="top-bar">
+            <div class="status-box">
+                <span id="status-indicator" class="status-dot disconnected"></span>
+                <span id="status-text" class="status-text">Đang kết nối...</span>
+                <button id="btn-switch-pc" class="btn-switch-pc" title="Đổi máy tính hoặc chọn kết nối khác">🔗 Đổi Máy</button>
+                <a href="/apk" class="btn-download-apk-header" title="Tải ứng dụng Android APK cho máy">📥 Tải APK</a>
+            </div>
+
+            <!-- Layout Mode Switcher (Keyboard / Trackpad / Combo) -->
+            <div class="layout-switcher">
+                <button id="btn-mode-kbd" class="layout-btn active" title="Chỉ Bàn phím">⌨️ Phím</button>
+                <button id="btn-mode-pad" class="layout-btn" title="Chỉ Bàn di chuột Trackpad">🖱️ Chuột</button>
+                <button id="btn-mode-combo" class="layout-btn" title="Hiển thị Cả Hai">⌨️+🖱️ Song song</button>
+            </div>
+
+            <!-- Sticky Modifiers Status Indicator -->
+            <div class="active-modifiers" id="active-modifiers">
+                <span class="mod-pill" id="mod-ctrl">CTRL</span>
+                <span class="mod-pill" id="mod-alt">ALT</span>
+                <span class="mod-pill" id="mod-shift">SHIFT</span>
+                <span class="mod-pill" id="mod-win">WIN</span>
+            </div>
+
+            <div class="header-controls">
+                <button id="btn-ghost-mode" class="icon-btn" title="Làm mờ / Ẩn phím toàn màn hình">👁️ 100% Phím</button>
+                <button id="btn-screen-toggle" class="icon-btn" title="Bật/Tắt Xem Màn hình PC thời gian thực">📺 Màn hình PC</button>
+                <button id="btn-scroll-dir" class="icon-btn" title="Đổi chiều cuộn chuột">🔄 Cuộn Chuột</button>
+                <button id="btn-fn-toggle" class="icon-btn" title="Hiện dãy phím F1-F12">⚡ Fn Bar</button>
+                <button id="btn-vibrate" class="icon-btn active" title="Bật/Tắt Rung">📳 Rung</button>
+                <button id="btn-fullscreen" class="icon-btn" title="Toàn màn hình">⛶ Mở rộng</button>
+            </div>
+        </header>
+
+        <!-- Expandable Fn Bar (F1-F12 & Special Keys) -->
+        <div id="fn-bar" class="fn-bar-container">
+            <div class="fn-bar-row">
+                <button class="key key-f" data-key="f1">F1</button>
+                <button class="key key-f" data-key="f2">F2</button>
+                <button class="key key-f" data-key="f3">F3</button>
+                <button class="key key-f" data-key="f4">F4</button>
+                <button class="key key-f" data-key="f5">F5</button>
+                <button class="key key-f" data-key="f6">F6</button>
+                <button class="key key-f" data-key="f7">F7</button>
+                <button class="key key-f" data-key="f8">F8</button>
+                <button class="key key-f" data-key="f9">F9</button>
+                <button class="key key-f" data-key="f10">F10</button>
+                <button class="key key-f" data-key="f11">F11</button>
+                <button class="key key-f" data-key="f12">F12</button>
+                <button class="key key-fn-special" data-key="prtsc">PrtSc</button>
+                <button class="key key-fn-special" data-key="del">Del</button>
+            </div>
+            <div class="fn-bar-row">
+                <button class="key key-fn-special" data-key="home">Home</button>
+                <button class="key key-fn-special" data-key="end">End</button>
+                <button class="key key-fn-special" data-key="pageup">PgUp</button>
+                <button class="key key-fn-special" data-key="pagedown">PgDn</button>
+                <button class="key key-fn-special" data-key="insert">Ins</button>
+                <button class="shortcut-btn" data-shortcut="ctrl,c">Ctrl+C</button>
+                <button class="shortcut-btn" data-shortcut="ctrl,v">Ctrl+V</button>
+                <button class="shortcut-btn" data-shortcut="ctrl,z">Ctrl+Z</button>
+                <button class="shortcut-btn" data-shortcut="ctrl,a">Ctrl+A</button>
+                <button class="shortcut-btn" data-shortcut="alt,tab">Alt+Tab</button>
+                <button class="shortcut-btn" data-shortcut="win,d">Win+D</button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA (Flex Layout for Keyboard & Trackpad) -->
+        <div id="content-workspace" class="content-workspace mode-kbd">
+
+            <!-- TRACKPAD PANEL (Mouse Surface) -->
+            <div id="trackpad-panel" class="trackpad-panel">
+                <div id="trackpad-surface" class="trackpad-surface">
+                    <div class="trackpad-hint" id="trackpad-hint">
+                        <span>🖱️ BÀN DI CHUỘT TRACKPAD</span>
+                        <small>Vuốt 1 ngón: Di chuột | Chạm 1 ngón: Chuột Trái | Chạm 2 ngón: Chuột Phải | Vuốt 2 ngón: Cuộn trang</small>
+                    </div>
+                </div>
+                <!-- Dedicated Mouse Buttons Bar -->
+                <div class="mouse-buttons-bar">
+                    <button id="btn-mouse-left" class="mouse-btn btn-click-left">🖱️ Chuột Trái</button>
+                    <button id="btn-mouse-scroll-up" class="mouse-btn btn-scroll">🎡 Cuộn Lên</button>
+                    <button id="btn-mouse-scroll-down" class="mouse-btn btn-scroll">🎡 Cuộn Xuống</button>
+                    <button id="btn-mouse-right" class="mouse-btn btn-click-right">🖱️ Chuột Phải</button>
+                </div>
+            </div>
+
+            <!-- MAIN SMARTPHONE KEYBOARD LAYOUT -->
+            <main id="keyboard-panel" class="keyboard-grid" data-kbd-state="abc">
+                <!-- Quick Mode Switching Tabs -->
+                <div class="kbd-mode-tabs">
+                    <button class="kbd-tab-btn active" data-mode="abc">ABC (Chữ)</button>
+                    <button class="kbd-tab-btn" data-mode="123">?123 (Số & Ký hiệu)</button>
+                    <button class="kbd-tab-btn" data-mode="pc">#+= PC (Phím PC mở rộng)</button>
+                </div>
+
+                <!-- PAGE 1: LETTERS (ABC) -->
+                <div class="kbd-page kbd-page-abc">
+                    <!-- Row 1: QWERTY Row 1 -->
+                    <div class="key-row">
+                        <button class="key key-letter" data-key="q">q</button>
+                        <button class="key key-letter" data-key="w">w</button>
+                        <button class="key key-letter" data-key="e">e</button>
+                        <button class="key key-letter" data-key="r">r</button>
+                        <button class="key key-letter" data-key="t">t</button>
+                        <button class="key key-letter" data-key="y">y</button>
+                        <button class="key key-letter" data-key="u">u</button>
+                        <button class="key key-letter" data-key="i">i</button>
+                        <button class="key key-letter" data-key="o">o</button>
+                        <button class="key key-letter" data-key="p">p</button>
+                    </div>
+
+                    <!-- Row 2: ASDF Row 2 (Indented for standard phone muscle memory) -->
+                    <div class="key-row key-row-indent">
+                        <button class="key key-letter" data-key="a">a</button>
+                        <button class="key key-letter" data-key="s">s</button>
+                        <button class="key key-letter" data-key="d">d</button>
+                        <button class="key key-letter" data-key="f">f</button>
+                        <button class="key key-letter" data-key="g">g</button>
+                        <button class="key key-letter" data-key="h">h</button>
+                        <button class="key key-letter" data-key="j">j</button>
+                        <button class="key key-letter" data-key="k">k</button>
+                        <button class="key key-letter" data-key="l">l</button>
+                    </div>
+
+                    <!-- Row 3: ZXCV Row 3 -->
+                    <div class="key-row">
+                        <button class="key key-shift mod-trigger" data-key="shift">⇧</button>
+                        <button class="key key-letter" data-key="z">z</button>
+                        <button class="key key-letter" data-key="x">x</button>
+                        <button class="key key-letter" data-key="c">c</button>
+                        <button class="key key-letter" data-key="v">v</button>
+                        <button class="key key-letter" data-key="b">b</button>
+                        <button class="key key-letter" data-key="n">n</button>
+                        <button class="key key-letter" data-key="m">m</button>
+                        <button class="key key-backspace" data-key="backspace">⌫</button>
+                    </div>
+
+                    <!-- Row 4: Bottom Control Row (Mode + Ctrl + Alt + Win + Space + , + . + Tab + Enter) -->
+                    <div class="key-row">
+                        <button class="key key-mode-btn" data-mode="123">?123</button>
+                        <button class="key key-modifier mod-trigger" data-key="ctrl">Ctrl</button>
+                        <button class="key key-modifier mod-trigger" data-key="alt">Alt</button>
+                        <button class="key key-modifier mod-trigger" data-key="win">Win</button>
+                        <button class="key key-space" data-key="space">␣ English ▾</button>
+                        <button class="key key-symbol" data-key=",">,</button>
+                        <button class="key key-symbol" data-key=".">.</button>
+                        <button class="key key-pc" data-key="tab">Tab</button>
+                        <button class="key key-enter" data-key="enter">↵</button>
+                    </div>
+                </div>
+
+                <!-- PAGE 2: NUMBERS & DUAL SYMBOLS (?123) -->
+                <div class="kbd-page kbd-page-123">
+                    <!-- Row 1: Numbers (Shift: ! @ # $ % ^ & * ( ) ) -->
+                    <div class="key-row">
+                        <button class="key" data-key="1" data-shift="!">1</button>
+                        <button class="key" data-key="2" data-shift="@">2</button>
+                        <button class="key" data-key="3" data-shift="#">3</button>
+                        <button class="key" data-key="4" data-shift="$">4</button>
+                        <button class="key" data-key="5" data-shift="%">5</button>
+                        <button class="key" data-key="6" data-shift="^">6</button>
+                        <button class="key" data-key="7" data-shift="&amp;">7</button>
+                        <button class="key" data-key="8" data-shift="*">8</button>
+                        <button class="key" data-key="9" data-shift="(">9</button>
+                        <button class="key" data-key="0" data-shift=")">0</button>
+                    </div>
+
+                    <!-- Row 2: PC Main Symbols (Shift: _ + { } | : " < > ? ) -->
+                    <div class="key-row">
+                        <button class="key" data-key="-" data-shift="_">-</button>
+                        <button class="key" data-key="=" data-shift="+">=</button>
+                        <button class="key" data-key="[" data-shift="{">[</button>
+                        <button class="key" data-key="]" data-shift="}">]</button>
+                        <button class="key" data-key="\" data-shift="|">\</button>
+                        <button class="key" data-key=";" data-shift=":">;</button>
+                        <button class="key" data-key="'" data-shift='"'>'</button>
+                        <button class="key" data-key="," data-shift="&lt;">,</button>
+                        <button class="key" data-key="." data-shift="&gt;">.</button>
+                        <button class="key" data-key="/" data-shift="?">/</button>
+                    </div>
+
+                    <!-- Row 3: Shift Key Restored + Clean Quick Symbols -->
+                    <div class="key-row">
+                        <button class="key key-shift mod-trigger" data-key="shift">⇧</button>
+                        <button class="key" data-key="`" data-shift="~">`</button>
+                        <button class="key" data-key="!">!</button>
+                        <button class="key" data-key="?">?</button>
+                        <button class="key" data-key=":">:</button>
+                        <button class="key" data-key='"'>"</button>
+                        <button class="key" data-key="+">+</button>
+                        <button class="key" data-key="_">_</button>
+                        <button class="key key-backspace" data-key="backspace">⌫</button>
+                    </div>
+
+                    <!-- Row 4: Bottom Control Row (Sequential Mode Button -> #+=) -->
+                    <div class="key-row">
+                        <button class="key key-mode-btn" data-mode="pc">#+=</button>
+                        <button class="key key-modifier mod-trigger" data-key="ctrl">Ctrl</button>
+                        <button class="key key-modifier mod-trigger" data-key="alt">Alt</button>
+                        <button class="key key-modifier mod-trigger" data-key="win">Win</button>
+                        <button class="key key-space" data-key="space">␣ English ▾</button>
+                        <button class="key key-symbol" data-key=",">,</button>
+                        <button class="key key-symbol" data-key=".">.</button>
+                        <button class="key key-pc" data-key="tab">Tab</button>
+                        <button class="key key-enter" data-key="enter">↵</button>
+                    </div>
+                </div>
+
+                <!-- PAGE 3: FUNCTION KEYS, PC CONTROLS & ARROW KEYPAD (#+=) -->
+                <div class="kbd-page kbd-page-pc">
+                    <!-- Row 1: F1 to F12 Function Keys Bar -->
+                    <div class="key-row">
+                        <button class="key key-f" data-key="f1">F1</button>
+                        <button class="key key-f" data-key="f2">F2</button>
+                        <button class="key key-f" data-key="f3">F3</button>
+                        <button class="key key-f" data-key="f4">F4</button>
+                        <button class="key key-f" data-key="f5">F5</button>
+                        <button class="key key-f" data-key="f6">F6</button>
+                        <button class="key key-f" data-key="f7">F7</button>
+                        <button class="key key-f" data-key="f8">F8</button>
+                        <button class="key key-f" data-key="f9">F9</button>
+                        <button class="key key-f" data-key="f10">F10</button>
+                        <button class="key key-f" data-key="f11">F11</button>
+                        <button class="key key-f" data-key="f12">F12</button>
+                    </div>
+
+                    <!-- Row 2: PC Controls & Clean Full-Size Inverted-T Arrow Cluster -->
+                    <div class="key-row">
+                        <button class="key key-pc" data-key="esc">Esc</button>
+                        <button class="key key-pc" data-key="del">Del</button>
+                        <button class="key key-pc" data-key="insert">Ins</button>
+                        <button class="key key-pc" data-key="prtsc">PrtSc</button>
+                        <button class="key key-pc" data-key="home">Home</button>
+                        <button class="key key-pc" data-key="end">End</button>
+                        <button class="key key-pc" data-key="pageup">PgUp</button>
+                        <button class="key key-pc" data-key="pagedown">PgDn</button>
+                        <button class="key key-arrow" data-key="left">◀</button>
+                        <button class="key key-arrow" data-key="up">▲</button>
+                        <button class="key key-arrow" data-key="down">▼</button>
+                        <button class="key key-arrow" data-key="right">▶</button>
+                    </div>
+
+                    <!-- Row 3: Special PC Shortcuts & Restored Shift Key -->
+                    <div class="key-row">
+                        <button class="key key-shift mod-trigger" data-key="shift">⇧</button>
+                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,c">Copy</button>
+                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,v">Paste</button>
+                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,x">Cut</button>
+                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,z">Undo</button>
+                        <button class="key key-pc shortcut-btn" data-shortcut="ctrl,a">SelAll</button>
+                        <button class="key key-pc shortcut-btn" data-shortcut="alt,tab">Alt+Tab</button>
+                        <button class="key key-pc shortcut-btn" data-shortcut="win,d">Win+D</button>
+                        <button class="key key-backspace" data-key="backspace">⌫</button>
+                    </div>
+
+                    <!-- Row 4: Bottom Control Row (Sequential Mode Button -> ABC) -->
+                    <div class="key-row">
+                        <button class="key key-mode-btn" data-mode="abc">ABC</button>
+                        <button class="key key-modifier mod-trigger" data-key="ctrl">Ctrl</button>
+                        <button class="key key-modifier mod-trigger" data-key="alt">Alt</button>
+                        <button class="key key-modifier mod-trigger" data-key="win">Win</button>
+                        <button class="key key-space" data-key="space">␣ English ▾</button>
+                        <button class="key key-symbol" data-key=",">,</button>
+                        <button class="key key-symbol" data-key=".">.</button>
+                        <button class="key key-pc" data-key="tab">Tab</button>
+                        <button class="key key-enter" data-key="enter">↵</button>
+                    </div>
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <script src="script.js?v=15.0"></script>
+</body>
+</html>

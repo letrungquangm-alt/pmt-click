@@ -1,0 +1,17 @@
+{
+  "name": "PMT Click",
+  "short_name": "PMT Click",
+  "description": "PMT Click - Phone to PC Keyboard & Mouse Remote Control",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#00e5ff",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

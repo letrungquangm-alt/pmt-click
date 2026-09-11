@@ -1,0 +1,7 @@
+.android_sdk/
+.build_apk/
+.jdk/
+bin/
+scratch*
+*.log
+*.idsig

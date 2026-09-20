@@ -1,6 +1,7 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 Set-Location $PSScriptRoot
+$driveRoot = (Split-Path -Qualifier $PSScriptRoot) + "\"
 
 $CSC = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 if (-not (Test-Path $CSC)) {
@@ -46,7 +47,10 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Copy-Item "bin\GMMenu.exe" "QuinGM luv Mthu Menu.exe" -Force
-Copy-Item "bin\GMMenu.exe" "E:\QuinGM luv Mthu Menu.exe" -Force
+Copy-Item "bin\GMMenu.exe" (Join-Path $driveRoot "QuinGM luv Mthu Menu.exe") -Force
+if (Test-Path (Join-Path $driveRoot "MThu")) {
+    Copy-Item "bin\GMMenu.exe" (Join-Path $driveRoot "MThu\QuinGM luv Mthu Menu.exe") -Force
+}
 Write-Host "[OK] Bien dich Menu Game thanh cong!" -ForegroundColor Green
 
 Write-Host "========================================================" -ForegroundColor Cyan
@@ -75,6 +79,9 @@ $uninstallerBytes = [byte[]]@(0x47, 0xE1, 0xBB, 0xA1, 0x20, 0x43, 0xC3, 0xA0, 0x
 $uninstallerName = [System.Text.Encoding]::UTF8.GetString($uninstallerBytes)
 
 Copy-Item "bin\Uninstall.exe" $uninstallerName -Force
+if (Test-Path (Join-Path $driveRoot "MThu")) {
+    Copy-Item "bin\Uninstall.exe" (Join-Path $driveRoot "MThu\$uninstallerName") -Force
+}
 Write-Host "[OK] Bien dich Trinh Go Cai Dat thanh cong!" -ForegroundColor Green
 
 Write-Host "========================================================" -ForegroundColor Cyan
@@ -105,25 +112,34 @@ $installerBytes = [byte[]]@(0x43, 0xC3, 0xA0, 0x69, 0x20, 0xC4, 0x90, 0xE1, 0xBA
 $installerName = [System.Text.Encoding]::UTF8.GetString($installerBytes)
 
 Copy-Item "bin\Installer.exe" $installerName -Force
-Copy-Item "bin\Installer.exe" (Join-Path "E:\" $installerName) -Force
+Copy-Item "bin\Installer.exe" (Join-Path $driveRoot $installerName) -Force
 
-# Don dep sach se tat ca file trung lap hoac loi font
-Get-ChildItem -Path "E:\" | Where-Object { ($_.Name -like "*Cai Dat QuinGM*" -or $_.Name -like "*C*i*t*QuinGM*") -and $_.Name -ne $installerName } | Remove-Item -Force -ErrorAction SilentlyContinue
-Get-ChildItem -Path $PSScriptRoot | Where-Object { ($_.Name -like "*Cai Dat QuinGM*" -or $_.Name -like "*C*i*t*QuinGM*") -and $_.Name -ne $installerName -and $_.Name -ne $uninstallerName } | Remove-Item -Force -ErrorAction SilentlyContinue
+# Tao shortcut tren Desktop
+try {
+    $desktopPath = [Environment]::GetFolderPath('Desktop')
+    if ([string]::IsNullOrEmpty($desktopPath) -or -not (Test-Path $desktopPath)) {
+        $desktopPath = Join-Path ([Environment]::GetFolderPath('UserProfile')) 'Desktop'
+    }
+    $wsh = New-Object -ComObject WScript.Shell
+    $scPath = Join-Path $desktopPath 'QuinGM luv Mthu Menu.lnk'
+    $targetExe = Join-Path $driveRoot "MThu\QuinGM luv Mthu Menu.exe"
+    if (-not (Test-Path $targetExe)) { $targetExe = Join-Path $driveRoot "QuinGM luv Mthu Menu.exe" }
+    $sc = $wsh.CreateShortcut($scPath)
+    $sc.TargetPath = $targetExe
+    $sc.WorkingDirectory = Split-Path -Parent $targetExe
+    $sc.IconLocation = "$targetExe,0"
+    $sc.Description = "QuinGM luv Mthu Menu (Portable Gaming & PMT Click)"
+    $sc.Save()
+    Write-Host "[OK] Da tao shortcut Desktop tai: $scPath" -ForegroundColor Green
+} catch { }
 
 # Don dep file test neu co
 if (Test-Path "test_install.ps1") { Remove-Item "test_install.ps1" -Force -ErrorAction SilentlyContinue }
-
-# Don dep folder QuinGM cu tren E:\ nếu có file lỗi tên
-if (Test-Path "E:\QuinGM") {
-    Get-ChildItem -Path "E:\QuinGM" | Where-Object { $_.Name -like "*G*C*i*t*QuinGM*" -and $_.Name -ne $uninstallerName } | Remove-Item -Force -ErrorAction SilentlyContinue
-    Copy-Item "bin\Uninstall.exe" (Join-Path "E:\QuinGM" $uninstallerName) -Force
-}
 
 Write-Host "[OK] Bien dich Trinh Cai Dat thanh cong!" -ForegroundColor Green
 
 Write-Host "========================================================" -ForegroundColor Cyan
 Write-Host "[SUCCESS] HOAN TAT BIEN DICH THANH CONG TOAN BO HE THONG:" -ForegroundColor Green
-Write-Host " -> E:\Cài Đặt QuinGM Menu.exe (Trinh cai dat tu dong quet o dia, giai nen app & uninstaller & tag an)" -ForegroundColor Magenta
-Write-Host " -> E:\QuinGM luv Mthu Menu.exe" -ForegroundColor Magenta
+Write-Host " -> $driveRoot$installerName" -ForegroundColor Magenta
+Write-Host " -> $driveRoot MThu\QuinGM luv Mthu Menu.exe" -ForegroundColor Magenta
 Write-Host "========================================================" -ForegroundColor Cyan

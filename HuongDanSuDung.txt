@@ -1,50 +1,53 @@
 ================================================================================
-          QUINGM LUV MTHU MENU - HUONG DAN SU DUNG NHANH
+          QUINGM LUV MTHU MENU - HUONG DAN SU DUNG TOAN DIEN
 ================================================================================
 
-1. VI TRI CO DINH CUA DU AN:
-   - Toan bo thu muc ung dung: E:\code\code\
-   - File chay chinh:          E:\code\code\QuinGM luv Mthu Menu.exe
-   - File chua danh sach game: E:\code\code\games.json
+1. MO HINH WINDOWS AO TREN O DI DONG (G:\MThu):
+   - Thu muc goc he sinh thai:  G:\MThu\
+   - Tat ca Phan mem / Games:   G:\MThu\Apps\
+     (Chrome, Steam, Discord, AudioRelay, Client, Games...)
+   - User Profile rieng biet:   G:\MThu\Users\Quân GM\
+     (Chua toan bo AppData, Desktop, Documents, Downloads, .gemini, .antigravity-ide...)
+   - File Menu danh sach app:   G:\MThu\menu.json (Che do AN - Hidden)
+   - Khoa xac thuc o dia:       anhyeuempmt.tag   (Che do AN - Hidden + System)
 
-2. BO CUC CAN DEU VA KHONG THUA KHOANG TRANG BEN PHAI:
-   - Cac the game duoc tinh toan tu dong (responsive grid) theo chieu rong cua man hinh.
-   - Luon lap day 100% chieu ngang (khong bao gio bi ho khoang trong ben phai).
+2. TINH NANG KEO-THA FILE CAI DAT (.EXE / .MSI / .BAT):
+   - Khi tai 1 file setup (Vi du: DiscordSetup.exe, ChromeSetup.exe, GameSetup.exe):
+   - Chi can KEO VA THA truc tiep file setup do vao cua so QuinGM Menu.
+   - He thong se tu dong hien thong bao xac nhan:
+     + Tu dong chuyen huong duong dan cai dat vao: G:\MThu\Apps\<TenApp>\
+     + Dieu huong bien moi truong AppData, LocalAppData, UserProfile ve G:\MThu\Users\Quân GM\
+   - Nhan YES, trinh cai dat se mo len cho ban bam Tiep tuc / Hoan tat.
+   - Khi cai xong, Menu se tu dong hoi them ung dung vao danh sach Menu!
 
-3. TINH NANG TICK CHON VA XOA THE HANG LOAT:
-   - Moi the deu co 1 o tick vuong phat sang Neon o goc tren ben trai.
-   - Nut "Chon Tat Ca" va "Xoa Hang Loat / Xoa Da Chon (N)" nam ngay tren thanh Header.
+3. GIAO DIEN SETUP WIZARD (CAU HINH MENU NHANH):
+   - Bam nut [⚙ Setup Menu] tren thanh Header cua ung dung:
+   - Tool se quet toan bo thu muc trong G:\MThu\Apps\
+   - Ban chi can click vao tung thu muc, chon file .exe can hien thi tren Menu.
+   - File se vao "Hang cho" (co the xoa hoac sap xep tuy y).
+   - Bam "Hoan tat Setup", ung dung se tu dong tao va cap nhat menu.json o che do An!
+
+4. TINH NANG TICK CHON VA XOA THE HANG LOAT:
+   - Moi the ung dung deu co 1 o tick vuong phat sang Neon o goc tren ben trai.
+   - Nut "Chon Tat Ca" va "Xoa Hang Loat" nam ngay tren thanh Header.
    - Khi tick chon, the phat sang vien Neon Cam sang ro rang.
    - Bam "Xoa Da Chon" se hien popup xac nhan tuy bien Neon Auburn cuc dep.
 
-4. TOOLTIP & MODAL HOVER TUY BIEN CAO CAP (NEON AUBURN):
-   - Xoa bo 100% ToolTip cu xau cua he thong Windows.
-   - Khi ro chuot vao the: Hien bang thong tin Neon Aubun sang trong (Icon, Ten, Trang thai file tren o E:, The loai, Mo ta, Phim tat).
-   - Khi ro chuot vao tung nut o goc tren phai (Mo vi tri file, Sua the, Xoa the, Khoidong, Tick chon):
-     Hien tooltip mini rieng biet dong bo theo phong cach Neon.
+5. TOOLTIP & MODAL HOVER TUY BIEN CAO CAP (NEON AUBURN):
+   - Khi re chuot vao the: Hien bang thong tin Neon Auburn sang trong.
+   - Khi re chuot vao tung nut mini (Mo thu muc, Sua the, Xoa the, Khoi dong):
+     Hien tooltip mini rieng biet dong bo phong cach Neon.
 
-5. CHUC NANG PMT CLICK (TICH HOP TRUC TIEP TRONG APP):
-   - Tich hop 100% vao giao dien app tai tab "📱 PMT Click" (khong con cua so popup roi).
-   - Bang dieu khien Server: Khoi dong / Dung Server, Mo Web Controller, Mo file PMT_Click.apk.
-   - Bang thong tin ket noi: Ma ID 6 so (UltraViewer style), Link 4G/5G Cloudflare Tunnel, Link Wi-Fi LAN, Link tai APK truc tiep + Ma QR Code quet nhanh bang camera dien thoai.
-   - BANG NHAT KY HOAT DONG THOI GIAN THUC (LIVE ACTIVITY LOG TERMINAL) RIENG BIET:
-     + Giao dien terminal dark neon cuc dep voi nut phong cach IDE.
-     + Hien thi day du lich su ket noi, thiet bi IP, trang thai port, link 4G/LAN.
-     + Ho tro nut "Xoa Log", "Copy Log" va checkbox tuy chon ghi log chi tiet thao tac phim/chuot.
-   - Da loai bo hoan toan cum tu "All-In-One" vi PMT Click la tinh nang nguyen ban co san cua ung dung.
+6. CHUC NANG PMT CLICK (DIEU KHIEN MAY TINH QUA DIEN THOAI):
+   - Tich hop truc tiep tai tab "PMT Click".
+   - Bang dieu khien Server: Khoi dong / Dung Server, Mo Web Controller, Mo APK.
+   - Ho tro ket noi qua mang LAN Wi-Fi hoac 4G/5G Cloudflare Tunnel.
+   - Domain Cloudflare Zero Trust: https://quiniumthu.qd.je
+   - Link tai App Android truc tiep:  https://quiniumthu.qd.je/apk
 
-6. CẤU HÌNH DOMAIN CHÍNH THỨC quiniumthu.qd.je TỪ A ĐẾN Z:
-   - Domain điều khiển từ xa chính thức: https://quiniumthu.qd.je
-   - Link tải App Android chính thức:   https://quiniumthu.qd.je/apk
-   - Cách kích hoạt kết nối vĩnh viễn qua Cloudflare Zero Trust:
-     + Cách 1: Trên giao diện PMT Click, bấm nút "🔑 Token CF" -> Notepad mở ra -> dán chuỗi Token (eyJh...) -> bấm Lưu (Ctrl+S).
-     + Cách 2: Chạy file "setup_domain_tunnel.bat" trong thư mục E:\code\code\ để nhập Token tự động.
-   - Sau khi lưu Token, bấm "Khởi Động Dịch Vụ", Cloudflare Tunnel sẽ trỏ trực tiếp domain quiniumthu.qd.je về máy tính của bạn với chứng chỉ bảo mật SSL HTTPS tự động!
-   - Mã QR Code trên giao diện tự động trỏ về https://quiniumthu.qd.je/apk để quét điện thoại là tải và kết nối ngay.
-
-7. CÁCH KHỞI CHẠY VÀ BIÊN DỊCH LẠI:
-   - Chạy ứng dụng: Click đúp "QuinGM luv Mthu Menu.exe"
-   - Biên dịch lại Menu: Chạy file "build.bat" trong E:\code\code\
-   - Biên dịch lại APK:  Chạy file "build_apk.ps1" trong E:\code\code\
+7. CACH KHOI CHAY VA BIEN DICH:
+   - Chay ung dung:   Mo "QuinGM luv Mthu Menu.exe" tu Desktop hoac trong G:\MThu\
+   - Bien dich lai:   Chay file "build.bat" hoac "build.ps1" trong G:\pmt-click\
+   - Go cai dat sach: Chay "Gỡ Cài Đặt QuinGM.exe" trong G:\pmt-click\ hoac G:\MThu\
 
 ================================================================================

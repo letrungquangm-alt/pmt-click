@@ -3773,6 +3773,7 @@ namespace QuinGMMenu
 
             UpdateDriveInfo();
             InitUI();
+            EnableDragDropRecursively(this);
             LoadGamesData();
 
             // Auto-start PMT Click server so user does not need to manually press start
@@ -4006,6 +4007,33 @@ namespace QuinGMMenu
             };
             btnSetup.Click += (s, e) => OpenSetupWizard();
 
+            HeaderActionButton btnInstallExe = new HeaderActionButton
+            {
+                IconSymbol = "ðŸ“¥",
+                ButtonText = "Tháº£/CÃ i Bá»™ CÃ i",
+                Width = 142,
+                Height = 36,
+                NormalBg1 = Color.FromArgb(20, 45, 35),
+                NormalBg2 = Color.FromArgb(12, 30, 22),
+                HoverBg1 = Color.FromArgb(30, 70, 52),
+                HoverBg2 = Color.FromArgb(18, 48, 35),
+                NormalBorder = Color.FromArgb(34, 197, 94),
+                HoverBorder = Color.FromArgb(74, 222, 128),
+                ForeColor = Color.FromArgb(220, 252, 231),
+                Margin = new Padding(0, 0, 8, 0)
+            };
+            btnInstallExe.Click += (s, e) => {
+                using (OpenFileDialog ofd = new OpenFileDialog())
+                {
+                    ofd.Title = "Chá»n file cÃ i Ä‘áº·t (.exe, .msi, .bat) Ä‘á»ƒ Ä‘iá»u hÆ°á»›ng vÃ o MThu\\Apps";
+                    ofd.Filter = "File CÃ i Äáº·t (*.exe;*.msi;*.bat)|*.exe;*.msi;*.bat|Táº¥t Cáº£ File (*.*)|*.*";
+                    if (ofd.ShowDialog(this) == DialogResult.OK)
+                    {
+                        HandleDroppedSetupExe(ofd.FileName);
+                    }
+                }
+            };
+
             Panel searchContainer = new Panel
             {
                 Width = 215,
@@ -4070,6 +4098,7 @@ namespace QuinGMMenu
             headerRight.Controls.Add(btnScan);
             headerRight.Controls.Add(btnAddApp);
             headerRight.Controls.Add(btnSetup);
+            headerRight.Controls.Add(btnInstallExe);
             headerRight.Controls.Add(btnInstallDesktop);
             headerRight.Controls.Add(searchContainer);
             header.Controls.Add(headerRight);
@@ -5269,6 +5298,31 @@ namespace QuinGMMenu
             }
         }
 
+        private void EnableDragDropRecursively(Control c)
+        {
+            if (c == null) return;
+            try
+            {
+                c.AllowDrop = true;
+                c.DragEnter -= MainForm_DragEnter;
+                c.DragEnter += MainForm_DragEnter;
+                c.DragOver -= MainForm_DragOver;
+                c.DragOver += MainForm_DragOver;
+                c.DragDrop -= MainForm_DragDrop;
+                c.DragDrop += MainForm_DragDrop;
+                c.DragLeave -= MainForm_DragLeave;
+                c.DragLeave += MainForm_DragLeave;
+                foreach (Control child in c.Controls)
+                {
+                    EnableDragDropRecursively(child);
+                }
+                c.ControlAdded += (s, e) => {
+                    EnableDragDropRecursively(e.Control);
+                };
+            }
+            catch { }
+        }
+
         private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -5277,9 +5331,11 @@ namespace QuinGMMenu
                 if (files != null && files.Length > 0)
                 {
                     string ext = Path.GetExtension(files[0]).ToLower();
-                    if (ext == ".exe" || ext == ".msi" || ext == ".bat")
+                    if (ext == ".exe" || ext == ".msi" || ext == ".bat" || ext == ".cmd")
                     {
                         e.Effect = DragDropEffects.Copy;
+                        lblStatus.Text = "ðŸ“¥ THáº¢ FILE Äá»‚ CÃ€I Äáº¶T PORTABLE VÃ€O MThu\\Apps!";
+                        lblStatus.ForeColor = Color.FromArgb(255, 140, 60);
                         return;
                     }
                 }
@@ -5287,8 +5343,28 @@ namespace QuinGMMenu
             e.Effect = DragDropEffects.None;
         }
 
+        private void MainForm_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void MainForm_DragLeave(object sender, EventArgs e)
+        {
+            lblStatus.Text = "âš¡ CHáº¾ Äá»˜ PORTABLE: ðŸ“ " + driveRoot + driveSpaceInfo + " (Dá»¯ liá»‡u cÃ´ láº­p 100% trÃªn á»• di Ä‘á»™ng)";
+            lblStatus.ForeColor = UITheme.NeonAmber;
+        }
+
         private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
+            lblStatus.Text = "âš¡ CHáº¾ Äá»˜ PORTABLE: ðŸ“ " + driveRoot + driveSpaceInfo + " (Dá»¯ liá»‡u cÃ´ láº­p 100% trÃªn á»• di Ä‘á»™ng)";
+            lblStatus.ForeColor = UITheme.NeonAmber;
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -5309,7 +5385,7 @@ namespace QuinGMMenu
                 string targetInstallDir = Path.Combine(driveRoot, "MThu", "Apps", appName);
 
                 DialogResult dr = NeonMessageBox.Show(this,
-                    "âš¡ PHÃT HIá»†N Bá»˜ CÃ€I Äáº¶T PORTABLE:\n" + Path.GetFileName(setupPath) + "\n\n" +
+                    "ðŸ“¦ PHÃT HIá»†N Bá»˜ CÃ€I Äáº¶T PORTABLE:\n" + Path.GetFileName(setupPath) + "\n\n" +
                     "Tool sáº½ tá»± Ä‘á»™ng Ä‘iá»u hÆ°á»›ng cÃ i Ä‘áº·t vá»:\nðŸ“ " + targetInstallDir + "\n\n" +
                     "(Dá»¯ liá»‡u cáº¥u hÃ¬nh sáº½ Ä‘Æ°á»£c lÆ°u biá»‡t láº­p trong G:\\MThu\\Users\\QuÃ¢n GM)\n\n" +
                     "Báº¥m YES Ä‘á»ƒ má»Ÿ trÃ¬nh cÃ i Ä‘áº·t vÃ  hoÃ n táº¥t cÃ¡c bÆ°á»›c tiáº¿p theo.",
@@ -5320,65 +5396,89 @@ namespace QuinGMMenu
                 if (dr == DialogResult.Yes)
                 {
                     EnsureDirectoryWritable(targetInstallDir);
-                    EnsureDirectoryWritable(Path.Combine(userProfileDir, "AppData", "Roaming"));
-                    EnsureDirectoryWritable(Path.Combine(userProfileDir, "AppData", "Local"));
+                    if (!string.IsNullOrEmpty(userProfileDir))
+                    {
+                        EnsureDirectoryWritable(Path.Combine(userProfileDir, "AppData", "Roaming"));
+                        EnsureDirectoryWritable(Path.Combine(userProfileDir, "AppData", "Local"));
+                    }
 
                     ProcessStartInfo psi = new ProcessStartInfo();
                     psi.FileName = setupPath;
                     psi.WorkingDirectory = Path.GetDirectoryName(setupPath);
                     psi.UseShellExecute = false;
 
-                    psi.EnvironmentVariables["ProgramFiles"] = Path.Combine(driveRoot, "MThu", "Apps");
-                    psi.EnvironmentVariables["ProgramFiles(x86)"] = Path.Combine(driveRoot, "MThu", "Apps");
-                    psi.EnvironmentVariables["ProgramData"] = Path.Combine(userProfileDir, "AppData", "Local");
-                    psi.EnvironmentVariables["APPDATA"] = Path.Combine(userProfileDir, "AppData", "Roaming");
-                    psi.EnvironmentVariables["LOCALAPPDATA"] = Path.Combine(userProfileDir, "AppData", "Local");
-                    psi.EnvironmentVariables["USERPROFILE"] = userProfileDir;
-                    psi.EnvironmentVariables["HOME"] = userProfileDir;
+                    string appsFolder = Path.Combine(driveRoot, "MThu", "Apps");
+                    psi.EnvironmentVariables["ProgramFiles"] = appsFolder;
+                    psi.EnvironmentVariables["ProgramFiles(x86)"] = appsFolder;
+                    if (!string.IsNullOrEmpty(userProfileDir))
+                    {
+                        psi.EnvironmentVariables["ProgramData"] = Path.Combine(userProfileDir, "AppData", "Local");
+                        psi.EnvironmentVariables["APPDATA"] = Path.Combine(userProfileDir, "AppData", "Roaming");
+                        psi.EnvironmentVariables["LOCALAPPDATA"] = Path.Combine(userProfileDir, "AppData", "Local");
+                        psi.EnvironmentVariables["USERPROFILE"] = userProfileDir;
+                        psi.EnvironmentVariables["HOME"] = userProfileDir;
+                    }
 
                     psi.Arguments = string.Format("/DIR=\"{0}\" /D={0}", targetInstallDir);
 
-                    Process proc = Process.Start(psi);
-                    lblStatus.Text = "âš¡ Äang cháº¡y bá»™ cÃ i: " + appName + " (ÄÃ£ Ä‘iá»u hÆ°á»›ng vá» MThu\\Apps)";
+                    Process proc = null;
+                    try
+                    {
+                        proc = Process.Start(psi);
+                    }
+                    catch
+                    {
+                        ProcessStartInfo psiAdmin = new ProcessStartInfo();
+                        psiAdmin.FileName = setupPath;
+                        psiAdmin.WorkingDirectory = Path.GetDirectoryName(setupPath);
+                        psiAdmin.Arguments = string.Format("/DIR=\"{0}\" /D={0}", targetInstallDir);
+                        psiAdmin.UseShellExecute = true;
+                        proc = Process.Start(psiAdmin);
+                    }
 
-                    ThreadPool.QueueUserWorkItem(delegate {
-                        try
-                        {
-                            proc.WaitForExit();
-                            this.Invoke((MethodInvoker)delegate {
-                                string foundExe = FindMainExeInDir(targetInstallDir);
-                                if (!string.IsNullOrEmpty(foundExe))
-                                {
-                                    DialogResult addDr = NeonMessageBox.Show(this,
-                                        "CÃ i Ä‘áº·t hoÃ n táº¥t!\nTÃ¬m tháº¥y file cháº¡y:\n" + Path.GetFileName(foundExe) + "\n\nBáº¡n cÃ³ muá»‘n Ä‘Æ°a '" + appName + "' vÃ o Menu ngay khÃ´ng?",
-                                        "ThÃªm á»¨ng Dá»¥ng Má»›i",
-                                        MessageBoxButtons.YesNo,
-                                        MessageBoxIcon.Question);
-                                    if (addDr == DialogResult.Yes)
+                    if (proc != null)
+                    {
+                        lblStatus.Text = "ðŸ“¦ Äang cháº¡y bá»™ cÃ i: " + appName + " (ÄÃ£ Ä‘iá»u hÆ°á»›ng vá» MThu\\Apps)";
+
+                        ThreadPool.QueueUserWorkItem(delegate {
+                            try
+                            {
+                                proc.WaitForExit();
+                                this.Invoke((MethodInvoker)delegate {
+                                    string foundExe = FindMainExeInDir(targetInstallDir);
+                                    if (!string.IsNullOrEmpty(foundExe))
                                     {
-                                        GameItem newItem = new GameItem
+                                        DialogResult addDr = NeonMessageBox.Show(this,
+                                            "âœ… CÃ i Ä‘áº·t hoÃ n táº¥t!\nTÃ¬m tháº¥y file cháº¡y:\n" + Path.GetFileName(foundExe) + "\n\nBáº¡n cÃ³ muá»‘n Ä‘Æ°a '" + appName + "' vÃ o Menu ngay khÃ´ng?",
+                                            "ThÃªm á»¨ng Dá»¥ng Má»›i",
+                                            MessageBoxButtons.YesNo,
+                                            MessageBoxIcon.Question);
+                                        if (addDr == DialogResult.Yes)
                                         {
-                                            id = Guid.NewGuid().ToString("N"),
-                                            name = appName,
-                                            category = "tool",
-                                            genre = "á»¨ng Dá»¥ng / Tiá»‡n Ãch",
-                                            rating = 5.0,
-                                            playCount = 100,
-                                            isHot = false,
-                                            exePath = foundExe,
-                                            icon = "âš¡"
-                                        };
-                                        allGames.Insert(0, newItem);
-                                        SaveGamesData();
-                                        UpdateCategoryBadges();
-                                        FilterGames();
-                                        lblStatus.Text = "âš¡ ÄÃ£ thÃªm vÃ o Menu: " + appName;
+                                            GameItem newItem = new GameItem
+                                            {
+                                                id = Guid.NewGuid().ToString("N"),
+                                                name = appName,
+                                                category = "tool",
+                                                genre = "á»¨ng Dá»¥ng / Tiá»‡n Ãch",
+                                                rating = 5.0,
+                                                playCount = 100,
+                                                isHot = false,
+                                                exePath = foundExe,
+                                                icon = "ðŸ“¦"
+                                            };
+                                            allGames.Insert(0, newItem);
+                                            SaveGamesData();
+                                            UpdateCategoryBadges();
+                                            FilterGames();
+                                            lblStatus.Text = "âœ… ÄÃ£ thÃªm vÃ o Menu: " + appName;
+                                        }
                                     }
-                                }
-                            });
-                        }
-                        catch { }
-                    });
+                                });
+                            }
+                            catch { }
+                        });
+                    }
                 }
             }
             catch (Exception ex)

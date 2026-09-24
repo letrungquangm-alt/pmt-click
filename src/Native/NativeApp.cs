@@ -568,12 +568,35 @@ namespace QuinGMMenu
                 }
                 else if (lowerName.Contains("discord"))
                 {
-                    Image img = TryExtractExe(Rebase("E:\\Discord\\app-1.0.9257\\Discord.exe", driveRoot));
-                    if (img != null) return img;
-                    string icoPath = Rebase("E:\\Discord\\app.ico", driveRoot);
-                    if (File.Exists(icoPath))
+                    string[] discordIcoCandidates = new string[]
                     {
-                        try { return (Image)new Bitmap(icoPath); } catch {}
+                        Rebase("E:\\MThu\\Apps\\Discord\\app.ico", driveRoot),
+                        Rebase("E:\\Discord\\app.ico", driveRoot)
+                    };
+                    foreach (var ico in discordIcoCandidates)
+                    {
+                        if (File.Exists(ico))
+                        {
+                            try { return (Image)new Bitmap(ico); } catch { }
+                        }
+                    }
+
+                    string discordFolder = Rebase("E:\\MThu\\Apps\\Discord", driveRoot);
+                    if (!Directory.Exists(discordFolder)) discordFolder = Rebase("E:\\Discord", driveRoot);
+                    if (Directory.Exists(discordFolder))
+                    {
+                        try
+                        {
+                            var appDirs = Directory.GetDirectories(discordFolder, "app-*");
+                            Array.Sort(appDirs);
+                            if (appDirs.Length > 0)
+                            {
+                                string exe = Path.Combine(appDirs[appDirs.Length - 1], "Discord.exe");
+                                Image img = TryExtractExe(exe);
+                                if (img != null) return img;
+                            }
+                        }
+                        catch { }
                     }
                 }
                 else if (lowerName.Contains("chrome"))
@@ -5234,9 +5257,14 @@ namespace QuinGMMenu
                     else if (game.name.IndexOf("discord", StringComparison.OrdinalIgnoreCase) >= 0 ||
                              targetPath.IndexOf("discord", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        string discordData = Path.Combine(driveRoot + "\\", "Discord", "data");
+                        string discordData = Path.Combine(driveRoot + "\\", "MThu", "Apps", "Discord", "data");
+                        if (!Directory.Exists(discordData)) discordData = Path.Combine(driveRoot + "\\", "Discord", "data");
                         if (!Directory.Exists(discordData)) discordData = appDataRoaming;
-                        string discordLocal = Path.Combine(driveRoot + "\\", "Discord", "local");
+
+                        string discordLocal = Path.Combine(driveRoot + "\\", "MThu", "Apps", "Discord", "local");
+                        if (!Directory.Exists(discordLocal)) discordLocal = Path.Combine(driveRoot + "\\", "Discord", "local");
+                        if (!Directory.Exists(discordLocal)) discordLocal = appDataLocal;
+
                         EnsureDirectoryWritable(discordData);
                         EnsureDirectoryWritable(discordLocal);
                         psi.EnvironmentVariables["DISCORD_USER_DATA_DIR"] = discordData;
